@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="案廠進度">
+<meta name="theme-color" content="#f5f0e8">
+<link rel="manifest" href="manifest.json">
+<title>案廠進度管理</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #f5f0e8;
+    --surface: #fdfaf5;
+    --surface2: #f0e9db;
+    --border: #ddd5c4;
+    --text: #2c1f0e;
+    --text2: #6b5440;
+    --text3: #a08c78;
+    --accent: #8b5e3c;
+    --accent2: #6b4423;
+    --high: #c0392b;
+    --med: #c07a2b;
+    --low: #7aaa8a;
+    --green: #3d8c60;
+    --red: #c0392b;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(100,60,20,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(245,240,232,0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: env(safe-area-inset-top, 0) 0 0;
+  }
+  .header-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px;
+    max-width: 900px; margin: 0 auto;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #a0734a, #6b4423);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; box-shadow: 0 2px 12px rgba(107,68,35,0.3);
+  }
+  .logo-text { font-size: 17px; font-weight: 700; letter-spacing: 0.5px; }
+  .logo-sub { font-size: 11px; color: var(--text3); font-weight: 400; }
+  .add-btn {
+    width: 38px; height: 38px; border-radius: 12px;
+    background: var(--accent); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: #fff; font-weight: 300;
+    box-shadow: 0 2px 12px rgba(107,68,35,0.30);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .add-btn:active { transform: scale(0.92); }
+
+  /* STATS BAR */
+  .stats {
+    display: flex; gap: 8px; padding: 10px 16px 14px;
+    overflow-x: auto; scrollbar-width: none; max-width: 900px; margin: 0 auto;
+  }
+  .stats::-webkit-scrollbar { display: none; }
+  .stat-chip {
+    flex-shrink: 0; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 20px;
+    padding: 5px 12px; font-size: 12px; display: flex; align-items: center; gap: 6px;
+    white-space: nowrap;
+  }
+  .stat-chip .num { font-weight: 700; font-size: 14px; }
+
+  /* FILTERS */
+  .filters {
+    padding: 0 16px 10px;
+    display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+    max-width: 900px; margin: 0 auto;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter-btn {
+    flex-shrink: 0; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+    background: transparent; color: var(--text2); font-size: 13px; cursor: pointer;
+    transition: all 0.15s; font-family: inherit;
+  }
+  .filter-btn.active {
+    background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600;
+  }
+
+  /* LIST */
+  .list {
+    padding: 8px 16px 100px;
+    max-width: 900px; margin: 0 auto;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+  }
+  .card:active { transform: scale(0.99); }
+  .card.overdue { border-color: var(--red); }
+  .card.overdue::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: var(--red);
+  }
+  .card-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding: 14px 14px 8px; gap: 8px;
+  }
+  .card-title-row { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+  .card-name {
+    font-size: 16px; font-weight: 600; line-height: 1.3;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .card-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; padding: 3px 8px;
+    border-radius: 6px; letter-spacing: 0.3px;
+  }
+  .badge-status-待跟進 { background: rgba(160,115,74,0.12); color: #7a5c3e; }
+  .badge-status-進行中 { background: rgba(61,100,185,0.12); color: #3d64b9; }
+  .badge-status-待確認 { background: rgba(192,122,43,0.15); color: #a0621a; }
+  .badge-status-已完成 { background: rgba(61,140,96,0.15); color: #2e7a52; }
+  .badge-status-暫停 { background: rgba(192,57,43,0.12); color: #c0392b; }
+  .badge-priority-高 { background: rgba(192,57,43,0.12); color: #c0392b; }
+  .badge-priority-中 { background: rgba(192,122,43,0.15); color: #a0621a; }
+  .badge-priority-低 { background: rgba(61,140,96,0.12); color: #3d8c60; }
+  .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .icon-btn {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 15px; transition: background 0.15s;
+  }
+  .icon-btn:active { background: var(--border); }
+
+  .card-body { padding: 0 14px 12px; }
+  .info-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 6px 12px; margin-bottom: 8px;
+  }
+  .info-item { display: flex; flex-direction: column; gap: 2px; }
+  .info-label { font-size: 10px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .info-val { font-size: 13px; color: var(--text2); font-weight: 500; }
+  .info-val.overdue-text { color: var(--red); font-weight: 700; }
+
+  .deposit-row {
+    background: var(--surface2); border-radius: 10px;
+    padding: 8px 10px; margin-top: 6px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .deposit-title { font-size: 11px; color: var(--accent); font-weight: 600; letter-spacing: 0.5px; }
+  .deposit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; }
+  .deposit-item { display: flex; flex-direction: column; gap: 1px; }
+  .deposit-label { font-size: 10px; color: var(--text3); }
+  .deposit-val { font-size: 13px; color: var(--text); font-weight: 500; }
+  .deposit-val.overdue-red { color: var(--red); font-weight: 700; }
+
+  .note-row {
+    margin-top: 8px; padding: 8px 10px;
+    background: rgba(139,94,60,0.06);
+    border-left: 2px solid rgba(139,94,60,0.3);
+    border-radius: 0 8px 8px 0;
+  }
+  .note-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+  .card-footer {
+    padding: 8px 14px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-user { font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 4px; }
+  .footer-time { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    width: 100%; max-width: 560px;
+    background: var(--surface); border-radius: 20px 20px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+    transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+    max-height: 92vh; overflow-y: auto;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-handle {
+    width: 40px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 12px auto 0;
+  }
+  .modal-title {
+    font-size: 18px; font-weight: 700;
+    padding: 16px 20px 8px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-close {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--surface2); border: none; cursor: pointer;
+    font-size: 16px; color: var(--text2); display: flex; align-items: center; justify-content: center;
+  }
+
+  .form { padding: 8px 20px 20px; display: flex; flex-direction: column; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--text2); letter-spacing: 0.5px; }
+  .form-input, .form-select, .form-textarea {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 10px; padding: 11px 13px;
+    font-size: 15px; font-family: inherit; outline: none;
+    transition: border-color 0.15s; width: 100%;
+    -webkit-appearance: none; appearance: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea { resize: none; min-height: 72px; line-height: 1.5; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .toggle-label { font-size: 14px; font-weight: 500; }
+  .toggle {
+    width: 46px; height: 26px; background: var(--border); border-radius: 13px;
+    position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+    border: none; outline: none;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: ''; position: absolute;
+    width: 20px; height: 20px; background: #fff; border-radius: 50%;
+    top: 3px; left: 3px; transition: transform 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .toggle.on::after { transform: translateX(20px); }
+
+  .deposit-section {
+    background: rgba(139,94,60,0.05);
+    border: 1px solid rgba(139,94,60,0.2);
+    border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .deposit-section-title { font-size: 13px; font-weight: 600; color: var(--accent); }
+
+  .submit-btn {
+    width: 100%; padding: 14px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: #fff; font-size: 16px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    box-shadow: 0 4px 16px rgba(107,68,35,0.30);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .submit-btn:active { transform: scale(0.98); box-shadow: 0 2px 8px rgba(107,68,35,0.20); }
+
+  /* EMPTY STATE */
+  .empty {
+    text-align: center; padding: 60px 20px;
+    color: var(--text3);
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-text { font-size: 15px; line-height: 1.6; }
+
+  /* FLOATING ACTION */
+  .fab {
+    position: fixed; bottom: calc(24px + env(safe-area-inset-bottom));
+    right: 20px; z-index: 150;
+    width: 56px; height: 56px; border-radius: 18px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: #fff; font-weight: 300;
+    box-shadow: 0 6px 24px rgba(107,68,35,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .fab:active { transform: scale(0.9); }
+
+  /* DELETE confirm */
+  .del-btn { color: var(--red) !important; }
+  
+  /* Overdue flash */
+  @keyframes pulse-border {
+    0%, 100% { border-color: var(--red); }
+    50% { border-color: rgba(239,68,68,0.3); }
+  }
+  .card.overdue { animation: pulse-border 2s infinite; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: calc(90px + env(safe-area-inset-bottom));
+    left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 18px; border-radius: 20px;
+    font-size: 13px; z-index: 300; opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Search bar */
+  .search-bar {
+    padding: 8px 16px; max-width: 900px; margin: 0 auto;
+  }
+  .search-input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 14px 10px 38px;
+    font-size: 14px; font-family: inherit; color: var(--text); outline: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a08c78' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: 12px center;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text3); }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🏭</div>
+      <div>
+        <div class="logo-text">案廠進度</div>
+        <div class="logo-sub">Project Tracker</div>
+      </div>
+    </div>
+    <button class="add-btn" onclick="openModal()">＋</button>
+  </div>
+  <div class="search-bar">
+    <input class="search-input" id="searchInput" type="search" placeholder="搜尋案廠名稱、負責人…" oninput="render()">
+  </div>
+  <div class="stats" id="statsBar"></div>
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter(this,'all')">全部</button>
+    <button class="filter-btn" data-filter="待跟進" onclick="setFilter(this,'待跟進')">待跟進</button>
+    <button class="filter-btn" data-filter="進行中" onclick="setFilter(this,'進行中')">進行中</button>
+    <button class="filter-btn" data-filter="待確認" onclick="setFilter(this,'待確認')">待確認</button>
+    <button class="filter-btn" data-filter="已完成" onclick="setFilter(this,'已完成')">已完成</button>
+    <button class="filter-btn" data-filter="overdue" onclick="setFilter(this,'overdue')">⚠ 逾期</button>
+  </div>
+</header>
+
+<main class="list" id="list"></main>
+
+<div class="toast" id="toast"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">
+      <span id="modalTitle">新增案廠</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form">
+      <div class="form-group">
+        <label class="form-label">案廠名稱 *</label>
+        <input class="form-input" id="f_name" type="text" placeholder="輸入案廠名稱">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">目前狀態</label>
+          <select class="form-select" id="f_status">
+            <option>待跟進</option>
+            <option>進行中</option>
+            <option>待確認</option>
+            <option>已完成</option>
+            <option>暫停</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">優先級</label>
+          <select class="form-select" id="f_priority">
+            <option>高</option>
+            <option selected>中</option>
+            <option>低</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">負責人</label>
+          <input class="form-input" id="f_owner" type="text" placeholder="負責人姓名">
+        </div>
+        <div class="form-group">
+          <label class="form-label">預計完成日</label>
+          <input class="form-input" id="f_duedate" type="date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">備註 / 最新進度</label>
+        <textarea class="form-textarea" id="f_note" placeholder="輸入最新進度或備註…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">操作者</label>
+        <input class="form-input" id="f_operator" type="text" placeholder="請輸入您的姓名">
+      </div>
+
+      <!-- 訂金 toggle -->
+      <div class="toggle-row">
+        <span class="toggle-label">💰 已收訂金</span>
+        <button class="toggle" id="toggle_deposit" onclick="toggleDeposit()"></button>
+      </div>
+
+      <!-- 訂金細節 -->
+      <div class="deposit-section" id="depositSection" style="display:none">
+        <div class="deposit-section-title">訂金 / 尾款資訊</div>
+        <div class="toggle-row" style="background:transparent;border:none;padding:0">
+          <span class="toggle-label" style="font-size:13px">需要支付尾款</span>
+          <button class="toggle" id="toggle_balance" onclick="toggleBalance()"></button>
+        </div>
+        <div id="balanceSection" style="display:none; display:flex; flex-direction:column; gap:10px;" hidden>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">尾款金額 (元)</label>
+              <input class="form-input" id="f_balance_amount" type="number" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">尾款預計支付日</label>
+              <input class="form-input" id="f_balance_date" type="date">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="saveProject()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ====== FIREBASE CONFIG ======
+const firebaseConfig = {
+  apiKey: "AIzaSyCr3QybupoUWt1sng9V1_uUP4LthCgFsV0",
+  authDomain: "lin320-c88ba.firebaseapp.com",
+  databaseURL: "https://lin320-c88ba-default-rtdb.firebaseio.com",
+  projectId: "lin320-c88ba",
+  storageBucket: "lin320-c88ba.firebasestorage.app",
+  messagingSenderId: "345326399405",
+  appId: "1:345326399405:web:c7f8bd56ddff2f4ff5bb24"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const colRef = collection(db, "projects");
+
+// ====== STATE ======
+let projects = [];
+let currentFilter = 'all';
+let editId = null;
+
+// Show loading
+document.getElementById('list').innerHTML = `<div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">連線中…</div></div>`;
+
+// ====== REALTIME LISTENER ======
+onSnapshot(colRef, (snapshot) => {
+  projects = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  render();
+}, (err) => {
+  console.error(err);
+  document.getElementById('list').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">連線失敗，請確認 Firestore 已啟用</div></div>`;
+});
+
+// ====== DATE HELPERS ======
+function today() { return new Date().toISOString().split('T')[0]; }
+function isOverdue(dateStr) { if (!dateStr) return false; return dateStr < today(); }
+function formatDate(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${m}/${day}`;
+}
+function timeAgo(ts) {
+  if (!ts) return '';
+  const ms = ts?.toMillis ? ts.toMillis() : ts;
+  const diff = Date.now() - ms;
+  const m = Math.floor(diff/60000);
+  if (m < 1) return '剛才';
+  if (m < 60) return `${m} 分鐘前`;
+  const h = Math.floor(m/60);
+  if (h < 24) return `${h} 小時前`;
+  return `${Math.floor(h/24)} 天前`;
+}
+
+// ====== RENDER ======
+function render() {
+  const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+  let list = [...projects];
+
+  list.sort((a, b) => {
+    const aOver = a.balanceDate && isOverdue(a.balanceDate) && a.needBalance;
+    const bOver = b.balanceDate && isOverdue(b.balanceDate) && b.needBalance;
+    if (aOver !== bOver) return aOver ? -1 : 1;
+    const pri = {'高':0,'中':1,'低':2};
+    if (pri[a.priority] !== pri[b.priority]) return pri[a.priority] - pri[b.priority];
+    if (a.duedate && b.duedate) return a.duedate.localeCompare(b.duedate);
+    return 0;
+  });
+
+  if (currentFilter !== 'all') {
+    if (currentFilter === 'overdue') {
+      list = list.filter(p => (isOverdue(p.duedate) && p.status !== '已完成') || (p.needBalance && isOverdue(p.balanceDate)));
+    } else {
+      list = list.filter(p => p.status === currentFilter);
+    }
+  }
+
+  if (q) {
+    list = list.filter(p =>
+      p.name?.toLowerCase().includes(q) ||
+      (p.owner||'').toLowerCase().includes(q) ||
+      (p.note||'').toLowerCase().includes(q)
+    );
+  }
+
+  const total = projects.length;
+  const inProgress = projects.filter(p => p.status === '進行中').length;
+  const done = projects.filter(p => p.status === '已完成').length;
+  const overdueCount = projects.filter(p => (isOverdue(p.duedate) && p.status !== '已完成') || (p.needBalance && isOverdue(p.balanceDate))).length;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-chip"><span class="num">${total}</span> 案廠</div>
+    <div class="stat-chip" style="color:var(--accent)"><span class="num" style="color:var(--accent)">${inProgress}</span> 進行中</div>
+    <div class="stat-chip" style="color:var(--green)"><span class="num" style="color:var(--green)">${done}</span> 完成</div>
+    ${overdueCount ? `<div class="stat-chip" style="color:var(--red)"><span class="num" style="color:var(--red)">${overdueCount}</span> ⚠ 逾期</div>` : ''}
+  `;
+
+  const el = document.getElementById('list');
+  if (list.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">尚無案廠資料<br>點右上角 ＋ 新增</div></div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(p => {
+    const overdueCard = (isOverdue(p.duedate) && p.status !== '已完成') || (p.needBalance && isOverdue(p.balanceDate));
+    const balanceOverdue = p.needBalance && p.balanceDate && isOverdue(p.balanceDate);
+    return `
+    <div class="card ${overdueCard ? 'overdue' : ''}">
+      <div class="card-header">
+        <div class="card-title-row">
+          <div class="card-name">${p.name}</div>
+          <div class="card-meta">
+            <span class="badge badge-status-${p.status}">${p.status}</span>
+            <span class="badge badge-priority-${p.priority}">${p.priority}</span>
+            ${p.hasDeposit ? '<span class="badge" style="background:rgba(61,140,96,0.12);color:#2e7a52">💰 已收訂</span>' : ''}
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn" onclick="openEdit('${p.id}')">✏️</button>
+          <button class="icon-btn del-btn" onclick="deleteProject('${p.id}')">🗑</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">負責人</span>
+            <span class="info-val">${p.owner || '—'}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">預計完成</span>
+            <span class="info-val ${isOverdue(p.duedate) && p.status !== '已完成' ? 'overdue-text' : ''}">${formatDate(p.duedate)}${isOverdue(p.duedate) && p.status !== '已完成' ? ' ⚠' : ''}</span>
+          </div>
+        </div>
+        ${p.needBalance ? `
+        <div class="deposit-row">
+          <div class="deposit-title">💳 尾款資訊</div>
+          <div class="deposit-grid">
+            <div class="deposit-item">
+              <span class="deposit-label">尾款金額</span>
+              <span class="deposit-val">${p.balanceAmount ? 'NT$ ' + Number(p.balanceAmount).toLocaleString() : '—'}</span>
+            </div>
+            <div class="deposit-item">
+              <span class="deposit-label">預計支付日</span>
+              <span class="deposit-val ${balanceOverdue ? 'overdue-red' : ''}">${formatDate(p.balanceDate)}${balanceOverdue ? ' ⚠ 逾期' : ''}</span>
+            </div>
+          </div>
+        </div>` : ''}
+        ${p.note ? `<div class="note-row"><div class="note-text">${p.note.replace(/\n/g,'<br>')}</div></div>` : ''}
+      </div>
+      <div class="card-footer">
+        <div class="footer-user">👤 ${p.lastOperator || '—'}</div>
+        <div class="footer-time">${timeAgo(p.updatedAt)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ====== FILTER ======
+window.setFilter = function(btn, f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+};
+
+// ====== MODAL ======
+window.openModal = function(id = null) {
+  editId = id;
+  const p = id ? projects.find(x => x.id === id) : null;
+  document.getElementById('modalTitle').textContent = id ? '編輯案廠' : '新增案廠';
+  document.getElementById('f_name').value = p?.name || '';
+  document.getElementById('f_status').value = p?.status || '待跟進';
+  document.getElementById('f_priority').value = p?.priority || '中';
+  document.getElementById('f_owner').value = p?.owner || '';
+  document.getElementById('f_duedate').value = p?.duedate || '';
+  document.getElementById('f_note').value = p?.note || '';
+  document.getElementById('f_operator').value = '';
+  const dep = p?.hasDeposit || false;
+  const bal = p?.needBalance || false;
+  document.getElementById('toggle_deposit').className = 'toggle' + (dep ? ' on' : '');
+  document.getElementById('toggle_balance').className = 'toggle' + (bal ? ' on' : '');
+  document.getElementById('depositSection').style.display = dep ? '' : 'none';
+  document.getElementById('balanceSection').hidden = !bal;
+  document.getElementById('f_balance_amount').value = p?.balanceAmount || '';
+  document.getElementById('f_balance_date').value = p?.balanceDate || '';
+  document.getElementById('modalOverlay').classList.add('open');
+};
+
+window.openEdit = function(id) { window.openModal(id); };
+
+window.closeModal = function() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  editId = null;
+};
+
+window.overlayClick = function(e) {
+  if (e.target === document.getElementById('modalOverlay')) window.closeModal();
+};
+
+window.toggleDeposit = function() {
+  const t = document.getElementById('toggle_deposit');
+  const on = !t.classList.contains('on');
+  t.className = 'toggle' + (on ? ' on' : '');
+  document.getElementById('depositSection').style.display = on ? '' : 'none';
+  if (!on) {
+    document.getElementById('toggle_balance').className = 'toggle';
+    document.getElementById('balanceSection').hidden = true;
+  }
+};
+
+window.toggleBalance = function() {
+  const t = document.getElementById('toggle_balance');
+  const on = !t.classList.contains('on');
+  t.className = 'toggle' + (on ? ' on' : '');
+  document.getElementById('balanceSection').hidden = !on;
+};
+
+// ====== SAVE ======
+window.saveProject = async function() {
+  const name = document.getElementById('f_name').value.trim();
+  if (!name) { showToast('請輸入案廠名稱'); return; }
+  const operator = document.getElementById('f_operator').value.trim() || '未知';
+  const hasDeposit = document.getElementById('toggle_deposit').classList.contains('on');
+  const needBalance = document.getElementById('toggle_balance').classList.contains('on');
+  const data = {
+    name,
+    status: document.getElementById('f_status').value,
+    priority: document.getElementById('f_priority').value,
+    owner: document.getElementById('f_owner').value.trim(),
+    duedate: document.getElementById('f_duedate').value,
+    note: document.getElementById('f_note').value.trim(),
+    hasDeposit,
+    needBalance: hasDeposit && needBalance,
+    balanceAmount: document.getElementById('f_balance_amount').value,
+    balanceDate: document.getElementById('f_balance_date').value,
+    lastOperator: operator,
+    updatedAt: serverTimestamp(),
+  };
+  try {
+    if (editId) {
+      await updateDoc(doc(db, "projects", editId), data);
+      showToast('✅ 已更新');
+    } else {
+      await addDoc(colRef, { ...data, createdAt: serverTimestamp() });
+      showToast('✅ 已新增');
+    }
+    window.closeModal();
+  } catch(e) {
+    showToast('❌ 儲存失敗：' + e.message);
+  }
+};
+
+// ====== DELETE ======
+window.deleteProject = async function(id) {
+  if (!confirm('確定刪除此案廠？')) return;
+  try {
+    await deleteDoc(doc(db, "projects", id));
+    showToast('已刪除');
+  } catch(e) {
+    showToast('❌ 刪除失敗');
+  }
+};
+
+// ====== TOAST ======
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+window.showToast = showToast;
+
+// ====== SEARCH ======
+document.getElementById('searchInput').addEventListener('input', render);
+
+// ====== PWA ======
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
