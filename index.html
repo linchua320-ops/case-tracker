@@ -53,11 +53,19 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 .fbtn{flex-shrink:0;padding:6px 15px;border-radius:var(--rchip);border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.15s;}
 .fbtn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;}
 
-/* SORT ROW */
-.sort-row{display:flex;gap:6px;padding:0 20px 10px;max-width:900px;margin:0 auto;align-items:center;}
-.sort-lbl{font-size:11px;color:var(--text3);font-weight:500;flex-shrink:0;}
-.sbtn{flex-shrink:0;padding:5px 12px;border-radius:var(--rchip);border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.15s;display:flex;align-items:center;gap:4px;}
-.sbtn.active{background:var(--sur2);border-color:var(--accent);color:var(--accent);font-weight:700;}
+/* SORT DROPDOWN */
+.sort-wrap{padding:0 20px 10px;max-width:900px;margin:0 auto;position:relative;width:fit-content;}
+.sort-trigger{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--rchip);border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.15s;user-select:none;}
+.sort-trigger.has-sort{border-color:var(--accent);color:var(--accent);background:var(--sur2);}
+.sort-arrow{font-size:10px;transition:transform 0.2s;display:inline-block;}
+.sort-trigger.open .sort-arrow{transform:rotate(180deg);}
+.sort-dropdown{position:absolute;top:calc(100% + 6px);left:0;background:var(--surface);border:1.5px solid var(--border);border-radius:16px;box-shadow:0 8px 24px rgba(60,30,10,0.12);overflow:hidden;z-index:150;min-width:170px;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity 0.18s,transform 0.18s;}
+.sort-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0);}
+.sort-opt{display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:background 0.12s;border:none;background:none;width:100%;font-family:inherit;text-align:left;}
+.sort-opt:not(:last-child){border-bottom:1px solid var(--border);}
+.sort-opt:hover{background:var(--sur2);}
+.sort-opt.active{color:var(--accent);font-weight:700;}
+.sort-check{font-size:11px;width:14px;}
 
 .hdivider{height:1px;background:var(--border);margin:0 20px;max-width:860px;margin-left:auto;margin-right:auto;}
 
@@ -205,11 +213,15 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
     <button class="fbtn" onclick="setFilter(this,'暫停')">暫停</button>
     <button class="fbtn" onclick="setFilter(this,'overdue')">⚠ 逾期</button>
   </div>
-  <div class="sort-row">
-    <span class="sort-lbl">排序</span>
-    <button class="sbtn active" id="sort-overdue" onclick="setSort(this,'overdue')">⚠ 逾期優先</button>
-    <button class="sbtn" id="sort-priority" onclick="setSort(this,'priority')">優先級</button>
-    <button class="sbtn" id="sort-duedate" onclick="setSort(this,'duedate')">預計完工日</button>
+  <div class="sort-wrap" id="sortWrap">
+    <button class="sort-trigger has-sort" id="sortTrigger" onclick="toggleSortMenu()">
+      ↕ 排序：<span id="sortLabel">逾期優先</span><span class="sort-arrow">▾</span>
+    </button>
+    <div class="sort-dropdown" id="sortDropdown">
+      <button class="sort-opt active" id="sort-overdue" onclick="setSort('overdue')"><span class="sort-check">✓</span>⚠ 逾期優先</button>
+      <button class="sort-opt" id="sort-priority" onclick="setSort('priority')"><span class="sort-check"></span>優先級</button>
+      <button class="sort-opt" id="sort-duedate" onclick="setSort('duedate')"><span class="sort-check"></span>預計完工日</button>
+    </div>
   </div>
   <div class="hdivider"></div>
 </header>
@@ -231,7 +243,7 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 <div class="toast" id="toast"></div>
 
 <!-- MODAL -->
-<div class="overlay" id="modalOverlay" onclick="overlayClick(event)">
+<div class="overlay" id="modalOverlay">
   <div class="modal">
     <div class="mhandle"></div>
     <div class="mhead">
@@ -540,7 +552,32 @@ window.switchView=(v)=>{
 
 // ── filter / sort ──
 window.setFilter=(btn,f)=>{ filter=f; document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); render(); };
-window.setSort=(btn,s)=>{ sortBy=s; document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); render(); };
+window.toggleSortMenu=()=>{
+  const t=document.getElementById('sortTrigger');
+  const d=document.getElementById('sortDropdown');
+  const open=d.classList.contains('open');
+  d.classList.toggle('open',!open);
+  t.classList.toggle('open',!open);
+};
+window.setSort=(s)=>{
+  sortBy=s;
+  const labels={'overdue':'逾期優先','priority':'優先級','duedate':'預計完工日'};
+  document.getElementById('sortLabel').textContent=labels[s];
+  document.querySelectorAll('.sort-opt').forEach(b=>{
+    b.classList.toggle('active',b.id==='sort-'+s);
+    b.querySelector('.sort-check').textContent=b.id==='sort-'+s?'✓':'';
+  });
+  document.getElementById('sortDropdown').classList.remove('open');
+  document.getElementById('sortTrigger').classList.remove('open');
+  render();
+};
+document.addEventListener('click',e=>{
+  const wrap=document.getElementById('sortWrap');
+  if(wrap && !wrap.contains(e.target)) {
+    document.getElementById('sortDropdown').classList.remove('open');
+    document.getElementById('sortTrigger').classList.remove('open');
+  }
+});
 window.toggleDone=()=>{ showDone=!showDone; render(); };
 
 // ── mark done / restore ──
@@ -554,28 +591,59 @@ window.restoreProject=async(id)=>{
 };
 
 // ── modal ──
-window.openModal=(id=null)=>{
-  editId=id; const p=id?projects.find(x=>x.id===id):null;
-  document.getElementById('modalTitle').textContent=id?'編輯案廠':'新增案廠';
+let draftData = null;
+function loadFormDraft(p) {
   document.getElementById('f_name').value=p?.name||'';
   document.getElementById('f_status').value=p?.status||'待跟進';
   document.getElementById('f_priority').value=p?.priority||'中';
   document.getElementById('f_owner').value=p?.owner||'';
   document.getElementById('f_duedate').value=p?.duedate||'';
   document.getElementById('f_note').value=p?.note||'';
-  document.getElementById('f_operator').value='';
-  const dep=p?.hasDeposit||false,bal=p?.needBalance||false;
+  document.getElementById('f_operator').value=p?.operator||'';
+  const dep=p?.hasDeposit||false, bal=p?.needBalance||false;
   document.getElementById('toggle_deposit').className='toggle'+(dep?' on':'');
   document.getElementById('toggle_balance').className='toggle'+(bal?' on':'');
   document.getElementById('depositSection').style.display=dep?'':'none';
   document.getElementById('balanceSection').hidden=!bal;
   document.getElementById('f_balance_amount').value=p?.balanceAmount||'';
   document.getElementById('f_balance_date').value=p?.balanceDate||'';
+}
+window.openModal=(id=null)=>{
+  editId=id;
+  document.getElementById('modalTitle').textContent=id?'編輯案廠':'新增案廠';
+  if(id){
+    draftData=null;
+    const p=projects.find(x=>x.id===id);
+    loadFormDraft(p);
+  } else {
+    if(draftData && draftData.editId===null) { loadFormDraft(draftData); }
+    else { loadFormDraft(null); }
+  }
   document.getElementById('modalOverlay').classList.add('open');
 };
 window.openEdit=id=>window.openModal(id);
-window.closeModal=()=>{ document.getElementById('modalOverlay').classList.remove('open'); editId=null; };
-window.overlayClick=e=>{ if(e.target===document.getElementById('modalOverlay'))window.closeModal(); };
+window.closeModal=()=>{
+  if(!editId) {
+    draftData={
+      editId:null,
+      name:document.getElementById('f_name').value,
+      status:document.getElementById('f_status').value,
+      priority:document.getElementById('f_priority').value,
+      owner:document.getElementById('f_owner').value,
+      duedate:document.getElementById('f_duedate').value,
+      note:document.getElementById('f_note').value,
+      operator:document.getElementById('f_operator').value,
+      hasDeposit:document.getElementById('toggle_deposit').classList.contains('on'),
+      needBalance:document.getElementById('toggle_balance').classList.contains('on'),
+      balanceAmount:document.getElementById('f_balance_amount').value,
+      balanceDate:document.getElementById('f_balance_date').value,
+    };
+    if(!draftData.name) draftData=null;
+  }
+  document.getElementById('modalOverlay').classList.remove('open');
+  editId=null;
+};
+// overlay click disabled - only ✕ closes modal
 window.toggleDeposit=()=>{ const t=document.getElementById('toggle_deposit'),on=!t.classList.contains('on'); t.className='toggle'+(on?' on':''); document.getElementById('depositSection').style.display=on?'':'none'; if(!on){document.getElementById('toggle_balance').className='toggle';document.getElementById('balanceSection').hidden=true;} };
 window.toggleBalance=()=>{ const t=document.getElementById('toggle_balance'),on=!t.classList.contains('on'); t.className='toggle'+(on?' on':''); document.getElementById('balanceSection').hidden=!on; };
 
@@ -589,7 +657,7 @@ window.saveProject=async()=>{
   try{
     if(editId){await updateDoc(doc(db,"projects",editId),data);toast('✅ 已更新');}
     else{await addDoc(col,{...data,createdAt:serverTimestamp()});toast('✅ 已新增');}
-    window.closeModal();
+    draftData=null; window.closeModal();
   }catch{toast('❌ 儲存失敗');}
 };
 
