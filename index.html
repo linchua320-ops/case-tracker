@@ -12,269 +12,171 @@
 <title>案廠進度</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
-
 :root {
-  --bg:      #f7f3ee;
-  --surface: #ffffff;
-  --sur2:    #f0ebe3;
-  --border:  #e5ddd3;
-  --text:    #1a1208;
-  --text2:   #5c4a35;
-  --text3:   #a8917a;
-  --accent:  #7c5535;
-  --acc2:    #5a3a1f;
-  --red:     #b83232;
-  --green:   #2e7a50;
-  --blue:    #3058a0;
-  --amber:   #8a5a10;
-  --rcard:   22px;
-  --rbtn:    14px;
-  --rchip:   100px;
+  --bg:#f7f3ee; --surface:#ffffff; --sur2:#f0ebe3; --border:#e5ddd3;
+  --text:#1a1208; --text2:#5c4a35; --text3:#a8917a;
+  --accent:#7c5535; --acc2:#5a3a1f;
+  --red:#b83232; --green:#2e7a50; --blue:#3058a0; --amber:#8a5a10;
+  --rcard:22px; --rbtn:14px; --rchip:100px;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body {
-  font-family: 'Noto Sans TC', -apple-system, sans-serif;
-  background: var(--bg); color: var(--text);
-  min-height: 100vh; min-height: -webkit-fill-available;
-  overflow-x: hidden;
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:-webkit-fill-available;overflow-x:hidden;}
 
 /* HEADER */
-.header {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(247,243,238,0.93);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  padding: env(safe-area-inset-top,0) 0 0;
-}
-.hinner {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px 10px; max-width: 900px; margin: 0 auto;
-}
-.logo-title { font-size: 27px; font-weight: 900; letter-spacing: -0.5px; line-height: 1; }
-.logo-sub   { font-size: 10px; color: var(--text3); font-weight: 400; letter-spacing: 1px; margin-top: 2px; }
-.add-btn {
-  width: 40px; height: 40px; border-radius: var(--rbtn);
-  background: var(--accent); border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 24px; font-weight: 300; line-height: 1;
-  box-shadow: 0 2px 10px rgba(92,58,31,0.25);
-  transition: transform 0.12s, opacity 0.12s;
-}
-.add-btn:active { transform: scale(0.88); opacity: 0.85; }
+.header{position:sticky;top:0;z-index:100;background:rgba(247,243,238,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:env(safe-area-inset-top,0) 0 0;}
+.hinner{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 10px;max-width:900px;margin:0 auto;}
+.logo-title{font-size:27px;font-weight:900;letter-spacing:-0.5px;line-height:1;}
+.logo-sub{font-size:10px;color:var(--text3);font-weight:400;letter-spacing:1px;margin-top:2px;}
+.hbtns{display:flex;gap:8px;align-items:center;}
+.add-btn{width:40px;height:40px;border-radius:var(--rbtn);background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;font-weight:300;line-height:1;box-shadow:0 2px 10px rgba(92,58,31,0.25);transition:transform 0.12s,opacity 0.12s;}
+.add-btn:active{transform:scale(0.88);opacity:0.85;}
+.view-toggle{display:flex;background:var(--sur2);border-radius:10px;padding:3px;gap:2px;}
+.vtbtn{padding:5px 10px;border-radius:8px;border:none;background:transparent;cursor:pointer;font-size:14px;transition:background 0.15s;}
+.vtbtn.active{background:var(--surface);box-shadow:0 1px 4px rgba(0,0,0,0.1);}
 
 /* STATS */
-.stats-row {
-  display: flex; gap: 8px; padding: 4px 20px 8px;
-  overflow-x: auto; scrollbar-width: none; max-width: 900px; margin: 0 auto;
-}
-.stats-row::-webkit-scrollbar { display: none; }
-.spill {
-  flex-shrink: 0; display: flex; align-items: baseline; gap: 4px;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--rchip); padding: 5px 13px; white-space: nowrap;
-}
-.spill .n { font-size: 15px; font-weight: 700; }
-.spill .l { font-size: 11px; color: var(--text3); }
+.stats-row{display:flex;gap:8px;padding:4px 20px 8px;overflow-x:auto;scrollbar-width:none;max-width:900px;margin:0 auto;}
+.stats-row::-webkit-scrollbar{display:none;}
+.spill{flex-shrink:0;display:flex;align-items:baseline;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rchip);padding:5px 13px;white-space:nowrap;}
+.spill .n{font-size:15px;font-weight:700;}
+.spill .l{font-size:11px;color:var(--text3);}
 
-/* SEARCH */
-.swrap { padding: 0 20px 6px; max-width: 900px; margin: 0 auto; }
-.sbox {
-  width: 100%; background: var(--surface);
-  border: 1px solid var(--border); border-radius: 14px;
-  padding: 10px 14px 10px 38px;
-  font-size: 14px; font-family: inherit; color: var(--text);
-  outline: none; -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' fill='%23a8917a' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: 13px center;
-  transition: border-color 0.15s;
-}
-.sbox:focus { border-color: var(--accent); }
-.sbox::placeholder { color: var(--text3); }
+/* SEARCH + SORT */
+.swrap{padding:0 20px 6px;max-width:900px;margin:0 auto;}
+.sbox{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 14px 10px 38px;font-size:14px;font-family:inherit;color:var(--text);outline:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' fill='%23a8917a' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:13px center;transition:border-color 0.15s;}
+.sbox:focus{border-color:var(--accent);}
+.sbox::placeholder{color:var(--text3);}
 
-/* FILTERS */
-.frow {
-  display: flex; gap: 6px; padding: 0 20px 10px;
-  overflow-x: auto; scrollbar-width: none; max-width: 900px; margin: 0 auto;
-}
-.frow::-webkit-scrollbar { display: none; }
-.fbtn {
-  flex-shrink: 0; padding: 6px 15px; border-radius: var(--rchip);
-  border: 1.5px solid var(--border); background: transparent;
-  color: var(--text2); font-size: 12px; font-weight: 500;
-  cursor: pointer; font-family: inherit; transition: all 0.15s;
-}
-.fbtn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
-.hdivider { height: 1px; background: var(--border); margin: 0 20px; max-width: 860px; margin-left: auto; margin-right: auto; }
+/* FILTER ROW */
+.frow{display:flex;gap:6px;padding:6px 20px 6px;overflow-x:auto;scrollbar-width:none;max-width:900px;margin:0 auto;align-items:center;}
+.frow::-webkit-scrollbar{display:none;}
+.fbtn{flex-shrink:0;padding:6px 15px;border-radius:var(--rchip);border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.fbtn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;}
+
+/* SORT ROW */
+.sort-row{display:flex;gap:6px;padding:0 20px 10px;max-width:900px;margin:0 auto;align-items:center;}
+.sort-lbl{font-size:11px;color:var(--text3);font-weight:500;flex-shrink:0;}
+.sbtn{flex-shrink:0;padding:5px 12px;border-radius:var(--rchip);border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.15s;display:flex;align-items:center;gap:4px;}
+.sbtn.active{background:var(--sur2);border-color:var(--accent);color:var(--accent);font-weight:700;}
+
+.hdivider{height:1px;background:var(--border);margin:0 20px;max-width:860px;margin-left:auto;margin-right:auto;}
 
 /* LIST */
-.list { padding: 14px 16px 110px; max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+.list{padding:14px 16px 110px;max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:12px;}
+
+/* SECTION HEADER */
+.section-head{display:flex;align-items:center;gap:10px;padding:4px 0 2px;}
+.section-head-title{font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.8px;text-transform:uppercase;}
+.section-divider{flex:1;height:1px;background:var(--border);}
+.done-toggle-btn{font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:inherit;font-weight:600;padding:2px 6px;}
 
 /* CARD */
-.card {
-  background: var(--surface); border-radius: var(--rcard); overflow: hidden;
-  box-shadow: 0 1px 3px rgba(60,30,10,0.07), 0 4px 14px rgba(60,30,10,0.05);
-  transition: transform 0.12s; position: relative;
-}
-.card:active { transform: scale(0.989); }
-.card.overdue { animation: opulse 2.4s ease-in-out infinite; }
-@keyframes opulse {
-  0%,100% { box-shadow: 0 0 0 1.5px var(--red), 0 4px 14px rgba(184,50,50,0.10); }
-  50%     { box-shadow: 0 0 0 1.5px rgba(184,50,50,0.25), 0 4px 14px rgba(184,50,50,0.04); }
-}
-.cstripe { height: 3px; background: transparent; }
-.card.overdue .cstripe { background: var(--red); }
+.card{background:var(--surface);border-radius:var(--rcard);overflow:hidden;box-shadow:0 1px 3px rgba(60,30,10,0.07),0 4px 14px rgba(60,30,10,0.05);transition:transform 0.12s;position:relative;}
+.card:active{transform:scale(0.989);}
+.card.overdue{animation:opulse 2.4s ease-in-out infinite;}
+@keyframes opulse{0%,100%{box-shadow:0 0 0 1.5px var(--red),0 4px 14px rgba(184,50,50,0.10);}50%{box-shadow:0 0 0 1.5px rgba(184,50,50,0.25),0 4px 14px rgba(184,50,50,0.04);}}
+.card.done-card{opacity:0.7;}
+.cstripe{height:3px;background:transparent;}
+.card.overdue .cstripe{background:var(--red);}
+.card.done-card .cstripe{background:var(--green);}
+.ctop{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 16px 8px;gap:10px;}
+.cleft{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
+.cname{font-size:17px;font-weight:700;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card.done-card .cname{text-decoration:line-through;color:var(--text3);}
+.cchips{display:flex;flex-wrap:wrap;gap:5px;}
+.chip{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 9px;border-radius:var(--rchip);letter-spacing:0.2px;}
+.ch-待跟進{background:rgba(92,74,53,0.10);color:var(--text2);}
+.ch-進行中{background:rgba(48,88,160,0.10);color:var(--blue);}
+.ch-待確認{background:rgba(138,90,16,0.12);color:var(--amber);}
+.ch-已完成{background:rgba(46,122,80,0.12);color:var(--green);}
+.ch-暫停{background:rgba(184,50,50,0.10);color:var(--red);}
+.ch-高{background:rgba(184,50,50,0.10);color:var(--red);}
+.ch-中{background:rgba(138,90,16,0.10);color:var(--amber);}
+.ch-低{background:rgba(46,122,80,0.10);color:var(--green);}
+.ch-訂{background:rgba(46,122,80,0.10);color:var(--green);}
+.cacts{display:flex;gap:6px;flex-shrink:0;padding-top:2px;}
+.actbtn{width:34px;height:34px;border-radius:12px;background:var(--sur2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:background 0.12s;}
+.actbtn:active{background:var(--border);}
+.done-btn{background:rgba(46,122,80,0.12);font-size:16px;}
+.restore-btn{background:rgba(48,88,160,0.10);font-size:14px;}
+.cbody{padding:0 16px 14px;display:flex;flex-direction:column;gap:8px;}
+.irow{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;}
+.icell{display:flex;flex-direction:column;gap:2px;}
+.ilbl{font-size:10px;font-weight:500;color:var(--text3);letter-spacing:0.6px;text-transform:uppercase;}
+.ival{font-size:13px;font-weight:500;color:var(--text2);}
+.ival.red{color:var(--red);font-weight:700;}
+.balblock{background:var(--sur2);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;}
+.ballbl{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.6px;text-transform:uppercase;}
+.balgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;}
+.bcell{display:flex;flex-direction:column;gap:1px;}
+.blbl{font-size:10px;color:var(--text3);}
+.bval{font-size:13px;font-weight:600;color:var(--text);}
+.bval.red{color:var(--red);font-weight:700;}
+.noteblock{background:rgba(124,85,53,0.06);border-radius:10px;padding:9px 11px;font-size:12px;font-weight:300;color:var(--text2);line-height:1.65;}
+.cfoot{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;border-top:1px solid var(--border);}
+.fuser,.ftime{font-size:11px;color:var(--text3);}
 
-.ctop {
-  display: flex; align-items: flex-start; justify-content: space-between;
-  padding: 16px 16px 8px; gap: 10px;
-}
-.cleft { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-.cname {
-  font-size: 17px; font-weight: 700; line-height: 1.25;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.cchips { display: flex; flex-wrap: wrap; gap: 5px; }
-.chip {
-  display: inline-flex; align-items: center;
-  font-size: 11px; font-weight: 600; padding: 3px 9px;
-  border-radius: var(--rchip); letter-spacing: 0.2px;
-}
-.ch-待跟進 { background: rgba(92,74,53,0.10);  color: var(--text2); }
-.ch-進行中 { background: rgba(48,88,160,0.10);  color: var(--blue); }
-.ch-待確認 { background: rgba(138,90,16,0.12);  color: var(--amber); }
-.ch-已完成 { background: rgba(46,122,80,0.12);  color: var(--green); }
-.ch-暫停   { background: rgba(184,50,50,0.10);  color: var(--red); }
-.ch-高     { background: rgba(184,50,50,0.10);  color: var(--red); }
-.ch-中     { background: rgba(138,90,16,0.10);  color: var(--amber); }
-.ch-低     { background: rgba(46,122,80,0.10);  color: var(--green); }
-.ch-訂     { background: rgba(46,122,80,0.10);  color: var(--green); }
+/* ── CALENDAR VIEW ── */
+.cal-wrap{padding:14px 16px 110px;max-width:900px;margin:0 auto;}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-title{font-size:20px;font-weight:800;}
+.cal-nav{width:36px;height:36px;border-radius:12px;background:var(--surface);border:1px solid var(--border);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--text2);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:20px;}
+.cal-dow{text-align:center;font-size:11px;font-weight:600;color:var(--text3);padding:4px 0 8px;letter-spacing:0.5px;}
+.cal-day{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:5px;cursor:pointer;position:relative;transition:background 0.12s;}
+.cal-day:hover{background:var(--sur2);}
+.cal-day.today{background:var(--accent);}
+.cal-day.today .cal-dn{color:#fff;font-weight:700;}
+.cal-day.other-month .cal-dn{color:var(--text3);}
+.cal-dn{font-size:13px;font-weight:500;line-height:1;}
+.cal-dots{display:flex;gap:2px;justify-content:center;margin-top:3px;flex-wrap:wrap;max-width:28px;}
+.cal-dot{width:5px;height:5px;border-radius:50%;}
+.dot-due{background:var(--accent);}
+.dot-bal{background:var(--red);}
 
-.cacts { display: flex; gap: 6px; flex-shrink: 0; padding-top: 2px; }
-.actbtn {
-  width: 34px; height: 34px; border-radius: 12px;
-  background: var(--sur2); border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; font-size: 15px;
-  transition: background 0.12s;
-}
-.actbtn:active { background: var(--border); }
-
-.cbody { padding: 0 16px 14px; display: flex; flex-direction: column; gap: 8px; }
-.irow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
-.icell { display: flex; flex-direction: column; gap: 2px; }
-.ilbl { font-size: 10px; font-weight: 500; color: var(--text3); letter-spacing: 0.6px; text-transform: uppercase; }
-.ival { font-size: 13px; font-weight: 500; color: var(--text2); }
-.ival.red { color: var(--red); font-weight: 700; }
-
-.balblock {
-  background: var(--sur2); border-radius: 14px; padding: 10px 12px;
-  display: flex; flex-direction: column; gap: 8px;
-}
-.ballbl { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 0.6px; text-transform: uppercase; }
-.balgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
-.bcell { display: flex; flex-direction: column; gap: 1px; }
-.blbl { font-size: 10px; color: var(--text3); }
-.bval { font-size: 13px; font-weight: 600; color: var(--text); }
-.bval.red { color: var(--red); font-weight: 700; }
-
-.noteblock {
-  background: rgba(124,85,53,0.06); border-radius: 10px; padding: 9px 11px;
-  font-size: 12px; font-weight: 300; color: var(--text2); line-height: 1.65;
-}
-.cfoot {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 9px 16px; border-top: 1px solid var(--border);
-}
-.fuser, .ftime { font-size: 11px; color: var(--text3); }
+/* CALENDAR EVENT LIST */
+.cal-events{display:flex;flex-direction:column;gap:8px;}
+.cal-ev-head{font-size:12px;font-weight:700;color:var(--text3);letter-spacing:0.6px;text-transform:uppercase;padding:8px 0 4px;}
+.cal-ev-card{background:var(--surface);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(60,30,10,0.06);}
+.cal-ev-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.cal-ev-info{flex:1;min-width:0;}
+.cal-ev-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-ev-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.cal-ev-date{font-size:12px;font-weight:600;color:var(--text2);flex-shrink:0;}
 
 /* MODAL */
-.overlay {
-  position: fixed; inset: 0; z-index: 200;
-  background: rgba(26,18,8,0.55);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  display: flex; align-items: flex-end; justify-content: center;
-  opacity: 0; pointer-events: none; transition: opacity 0.22s;
-}
-.overlay.open { opacity: 1; pointer-events: all; }
-.modal {
-  width: 100%; max-width: 560px; background: var(--bg);
-  border-radius: 28px 28px 0 0;
-  padding-bottom: env(safe-area-inset-bottom, 20px);
-  transform: translateY(100%);
-  transition: transform 0.32s cubic-bezier(0.32,0.72,0,1);
-  max-height: 93vh; overflow-y: auto;
-}
-.overlay.open .modal { transform: translateY(0); }
-.mhandle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 14px auto 0; }
-.mhead {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 22px 6px;
-}
-.mhead-title { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
-.mclose {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: var(--sur2); border: none; cursor: pointer;
-  font-size: 15px; color: var(--text2);
-  display: flex; align-items: center; justify-content: center;
-}
-.form { padding: 10px 22px 24px; display: flex; flex-direction: column; gap: 16px; }
-.fgrp { display: flex; flex-direction: column; gap: 6px; }
-.flbl { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: 0.7px; text-transform: uppercase; }
-.finput, .fselect, .ftextarea {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 14px; color: var(--text);
-  padding: 12px 14px; font-size: 15px; font-family: inherit;
-  outline: none; width: 100%; -webkit-appearance: none; appearance: none;
-  transition: border-color 0.15s;
-}
-.finput:focus, .fselect:focus, .ftextarea:focus { border-color: var(--accent); }
-.ftextarea { resize: none; min-height: 76px; line-height: 1.55; }
-.fgrow2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.trow {
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 14px; padding: 13px 16px;
-}
-.tlbl { font-size: 14px; font-weight: 500; }
-.toggle {
-  width: 50px; height: 28px; background: var(--border); border-radius: 14px;
-  position: relative; cursor: pointer; border: none; outline: none;
-  transition: background 0.22s; flex-shrink: 0;
-}
-.toggle.on { background: var(--accent); }
-.toggle::after {
-  content: ''; position: absolute;
-  width: 22px; height: 22px; background: #fff; border-radius: 50%;
-  top: 3px; left: 3px; transition: transform 0.22s;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
-}
-.toggle.on::after { transform: translateX(22px); }
-.depbox {
-  background: rgba(124,85,53,0.06); border: 1.5px solid rgba(124,85,53,0.18);
-  border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px;
-}
-.depbox-title { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 0.6px; text-transform: uppercase; }
-.savebtn {
-  width: 100%; padding: 15px; border-radius: 16px;
-  background: var(--accent); border: none; color: #fff;
-  font-size: 16px; font-weight: 800; font-family: inherit; cursor: pointer;
-  letter-spacing: 0.3px; box-shadow: 0 4px 18px rgba(92,58,31,0.28);
-  transition: transform 0.12s, opacity 0.12s;
-}
-.savebtn:active { transform: scale(0.97); opacity: 0.9; }
+.overlay{position:fixed;inset:0;z-index:200;background:rgba(26,18,8,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.22s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{width:100%;max-width:560px;background:var(--bg);border-radius:28px 28px 0 0;padding-bottom:env(safe-area-inset-bottom,20px);transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);max-height:93vh;overflow-y:auto;}
+.overlay.open .modal{transform:translateY(0);}
+.mhandle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:14px auto 0;}
+.mhead{display:flex;align-items:center;justify-content:space-between;padding:16px 22px 6px;}
+.mhead-title{font-size:20px;font-weight:800;letter-spacing:-0.3px;}
+.mclose{width:30px;height:30px;border-radius:50%;background:var(--sur2);border:none;cursor:pointer;font-size:15px;color:var(--text2);display:flex;align-items:center;justify-content:center;}
+.form{padding:10px 22px 24px;display:flex;flex-direction:column;gap:16px;}
+.fgrp{display:flex;flex-direction:column;gap:6px;}
+.flbl{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.7px;text-transform:uppercase;}
+.finput,.fselect,.ftextarea{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;color:var(--text);padding:12px 14px;font-size:15px;font-family:inherit;outline:none;width:100%;-webkit-appearance:none;appearance:none;transition:border-color 0.15s;}
+.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--accent);}
+.ftextarea{resize:none;min-height:76px;line-height:1.55;}
+.fgrow2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.trow{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:13px 16px;}
+.tlbl{font-size:14px;font-weight:500;}
+.toggle{width:50px;height:28px;background:var(--border);border-radius:14px;position:relative;cursor:pointer;border:none;outline:none;transition:background 0.22s;flex-shrink:0;}
+.toggle.on{background:var(--accent);}
+.toggle::after{content:'';position:absolute;width:22px;height:22px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform 0.22s;box-shadow:0 1px 4px rgba(0,0,0,0.18);}
+.toggle.on::after{transform:translateX(22px);}
+.depbox{background:rgba(124,85,53,0.06);border:1.5px solid rgba(124,85,53,0.18);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;}
+.depbox-title{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.6px;text-transform:uppercase;}
+.savebtn{width:100%;padding:15px;border-radius:16px;background:var(--accent);border:none;color:#fff;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;letter-spacing:0.3px;box-shadow:0 4px 18px rgba(92,58,31,0.28);transition:transform 0.12s,opacity 0.12s;}
+.savebtn:active{transform:scale(0.97);opacity:0.9;}
 
 /* EMPTY / TOAST */
-.empty { text-align: center; padding: 70px 20px; color: var(--text3); }
-.eico  { font-size: 52px; margin-bottom: 14px; }
-.etxt  { font-size: 15px; font-weight: 300; line-height: 1.7; }
-.toast {
-  position: fixed; bottom: calc(88px + env(safe-area-inset-bottom));
-  left: 50%; transform: translateX(-50%) translateY(14px);
-  background: var(--text); color: #fff; padding: 10px 20px;
-  border-radius: var(--rchip); font-size: 13px; font-weight: 500;
-  z-index: 400; opacity: 0; pointer-events: none;
-  transition: opacity 0.18s, transform 0.18s; white-space: nowrap;
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.empty{text-align:center;padding:70px 20px;color:var(--text3);}
+.eico{font-size:52px;margin-bottom:14px;}
+.etxt{font-size:15px;font-weight:300;line-height:1.7;}
+.toast{position:fixed;bottom:calc(88px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(14px);background:var(--text);color:#fff;padding:10px 20px;border-radius:var(--rchip);font-size:13px;font-weight:500;z-index:400;opacity:0;pointer-events:none;transition:opacity 0.18s,transform 0.18s;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
@@ -285,24 +187,47 @@ body {
       <div class="logo-title">案廠進度</div>
       <div class="logo-sub">PROJECT TRACKER</div>
     </div>
-    <button class="add-btn" onclick="openModal()">＋</button>
+    <div class="hbtns">
+      <div class="view-toggle">
+        <button class="vtbtn active" id="vt-list" onclick="switchView('list')">☰</button>
+        <button class="vtbtn" id="vt-cal" onclick="switchView('cal')">📅</button>
+      </div>
+      <button class="add-btn" onclick="openModal()">＋</button>
+    </div>
   </div>
-  <div class="swrap">
-    <input class="sbox" id="searchInput" type="search" placeholder="搜尋案廠、負責人…">
-  </div>
+  <div class="swrap"><input class="sbox" id="searchInput" type="search" placeholder="搜尋案廠、負責人…"></div>
   <div class="stats-row" id="statsBar"></div>
-  <div class="frow">
+  <div class="frow" id="filterRow">
     <button class="fbtn active" onclick="setFilter(this,'all')">全部</button>
     <button class="fbtn" onclick="setFilter(this,'待跟進')">待跟進</button>
     <button class="fbtn" onclick="setFilter(this,'進行中')">進行中</button>
     <button class="fbtn" onclick="setFilter(this,'待確認')">待確認</button>
-    <button class="fbtn" onclick="setFilter(this,'已完成')">已完成</button>
+    <button class="fbtn" onclick="setFilter(this,'暫停')">暫停</button>
     <button class="fbtn" onclick="setFilter(this,'overdue')">⚠ 逾期</button>
+  </div>
+  <div class="sort-row">
+    <span class="sort-lbl">排序</span>
+    <button class="sbtn active" id="sort-overdue" onclick="setSort(this,'overdue')">⚠ 逾期優先</button>
+    <button class="sbtn" id="sort-priority" onclick="setSort(this,'priority')">優先級</button>
+    <button class="sbtn" id="sort-duedate" onclick="setSort(this,'duedate')">預計完工日</button>
   </div>
   <div class="hdivider"></div>
 </header>
 
-<main class="list" id="list"></main>
+<!-- LIST VIEW -->
+<main class="list" id="listView"></main>
+
+<!-- CALENDAR VIEW -->
+<div class="cal-wrap" id="calView" style="display:none">
+  <div class="cal-header">
+    <button class="cal-nav" onclick="calPrev()">‹</button>
+    <div class="cal-title" id="calTitle"></div>
+    <button class="cal-nav" onclick="calNext()">›</button>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+  <div class="cal-events" id="calEvents"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- MODAL -->
@@ -381,104 +306,257 @@ body {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const app = initializeApp({
-  apiKey: "AIzaSyCr3QybupoUWt1sng9V1_uUP4LthCgFsV0",
-  authDomain: "lin320-c88ba.firebaseapp.com",
-  databaseURL: "https://lin320-c88ba-default-rtdb.firebaseio.com",
-  projectId: "lin320-c88ba",
-  storageBucket: "lin320-c88ba.firebasestorage.app",
-  messagingSenderId: "345326399405",
-  appId: "1:345326399405:web:c7f8bd56ddff2f4ff5bb24"
+  apiKey:"AIzaSyCr3QybupoUWt1sng9V1_uUP4LthCgFsV0",
+  authDomain:"lin320-c88ba.firebaseapp.com",
+  databaseURL:"https://lin320-c88ba-default-rtdb.firebaseio.com",
+  projectId:"lin320-c88ba",
+  storageBucket:"lin320-c88ba.firebasestorage.app",
+  messagingSenderId:"345326399405",
+  appId:"1:345326399405:web:c7f8bd56ddff2f4ff5bb24"
 });
 const db = getFirestore(app);
 const col = collection(db, "projects");
 
-let projects = [], filter = 'all', editId = null;
+let projects=[], filter='all', sortBy='overdue', editId=null;
+let currentView='list', showDone=false;
+let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
 
-document.getElementById('list').innerHTML = `<div class="empty"><div class="eico">⏳</div><div class="etxt">連線中…</div></div>`;
+document.getElementById('listView').innerHTML=`<div class="empty"><div class="eico">⏳</div><div class="etxt">連線中…</div></div>`;
 
-onSnapshot(col, s => { projects = s.docs.map(d=>({id:d.id,...d.data()})); render(); },
-  () => { document.getElementById('list').innerHTML = `<div class="empty"><div class="eico">⚠️</div><div class="etxt">連線失敗<br>請確認 Firestore 已啟用</div></div>`; });
+onSnapshot(col, s=>{ projects=s.docs.map(d=>({id:d.id,...d.data()})); render(); },
+  ()=>{ document.getElementById('listView').innerHTML=`<div class="empty"><div class="eico">⚠️</div><div class="etxt">連線失敗</div></div>`; });
 
-const today = () => new Date().toISOString().split('T')[0];
-const isOD  = d => d && d < today();
-const fmt   = d => { if(!d) return '—'; const[,m,dd]=d.split('-'); return `${m}/${dd}`; };
-function ago(ts) {
-  if (!ts) return '';
-  const ms = ts?.toMillis ? ts.toMillis() : ts;
-  const m = Math.floor((Date.now()-ms)/60000);
-  if (m<1) return '剛才'; if (m<60) return `${m}分前`;
-  const h = Math.floor(m/60); if (h<24) return `${h}小時前`;
-  return `${Math.floor(h/24)}天前`;
+// ── helpers ──
+const today=()=>new Date().toISOString().split('T')[0];
+const isOD=d=>d&&d<today();
+const fmt=d=>{ if(!d)return'—'; const[,m,dd]=d.split('-'); return`${m}/${dd}`; };
+function ago(ts){
+  if(!ts)return'';
+  const ms=ts?.toMillis?ts.toMillis():ts;
+  const m=Math.floor((Date.now()-ms)/60000);
+  if(m<1)return'剛才'; if(m<60)return`${m}分前`;
+  const h=Math.floor(m/60); if(h<24)return`${h}小時前`;
+  return`${Math.floor(h/24)}天前`;
 }
 
-function render() {
-  const q = (document.getElementById('searchInput').value||'').trim().toLowerCase();
-  let list = [...projects].sort((a,b)=>{
-    const ao=a.needBalance&&isOD(a.balanceDate), bo=b.needBalance&&isOD(b.balanceDate);
-    if(ao!==bo) return ao?-1:1;
-    const p={'高':0,'中':1,'低':2}; if(p[a.priority]!==p[b.priority]) return p[a.priority]-p[b.priority];
-    if(a.duedate&&b.duedate) return a.duedate.localeCompare(b.duedate); return 0;
+// ── sort ──
+function sortList(list){
+  return list.sort((a,b)=>{
+    if(sortBy==='overdue'){
+      const ao=a.needBalance&&isOD(a.balanceDate), bo=b.needBalance&&isOD(b.balanceDate);
+      if(ao!==bo)return ao?-1:1;
+      const p={'高':0,'中':1,'低':2};
+      if(p[a.priority]!==p[b.priority])return p[a.priority]-p[b.priority];
+      if(a.duedate&&b.duedate)return a.duedate.localeCompare(b.duedate);
+    } else if(sortBy==='priority'){
+      const p={'高':0,'中':1,'低':2};
+      if(p[a.priority]!==p[b.priority])return p[a.priority]-p[b.priority];
+      if(a.duedate&&b.duedate)return a.duedate.localeCompare(b.duedate);
+    } else if(sortBy==='duedate'){
+      if(a.duedate&&b.duedate)return a.duedate.localeCompare(b.duedate);
+      if(a.duedate)return -1; if(b.duedate)return 1;
+    }
+    return 0;
   });
-  if (filter==='overdue') list=list.filter(p=>(isOD(p.duedate)&&p.status!=='已完成')||(p.needBalance&&isOD(p.balanceDate)));
-  else if (filter!=='all') list=list.filter(p=>p.status===filter);
-  if (q) list=list.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.owner||'').toLowerCase().includes(q)||(p.note||'').toLowerCase().includes(q));
+}
 
-  const tot=projects.length, ing=projects.filter(p=>p.status==='進行中').length,
-        dn=projects.filter(p=>p.status==='已完成').length,
-        od=projects.filter(p=>(isOD(p.duedate)&&p.status!=='已完成')||(p.needBalance&&isOD(p.balanceDate))).length;
-  document.getElementById('statsBar').innerHTML =
+// ── card HTML ──
+function cardHTML(p, isDone=false){
+  const od=(isOD(p.duedate)&&!isDone)||(p.needBalance&&isOD(p.balanceDate));
+  const bod=p.needBalance&&isOD(p.balanceDate);
+  return`<div class="card ${od?'overdue':''} ${isDone?'done-card':''}">
+    <div class="cstripe"></div>
+    <div class="ctop">
+      <div class="cleft">
+        <div class="cname">${p.name}</div>
+        <div class="cchips">
+          <span class="chip ch-${p.status}">${p.status}</span>
+          <span class="chip ch-${p.priority}">${p.priority}優先</span>
+          ${p.hasDeposit?'<span class="chip ch-訂">已收訂</span>':''}
+        </div>
+      </div>
+      <div class="cacts">
+        ${isDone
+          ? `<button class="actbtn restore-btn" title="移回進行中" onclick="restoreProject('${p.id}')">↩</button>`
+          : `<button class="actbtn done-btn" title="標記完成" onclick="markDone('${p.id}')">✓</button>`
+        }
+        <button class="actbtn" onclick="openEdit('${p.id}')">✏️</button>
+        <button class="actbtn" onclick="deleteProject('${p.id}')" style="color:var(--red)">🗑</button>
+      </div>
+    </div>
+    <div class="cbody">
+      <div class="irow">
+        <div class="icell"><span class="ilbl">負責人</span><span class="ival">${p.owner||'—'}</span></div>
+        <div class="icell"><span class="ilbl">預計完成</span><span class="ival ${isOD(p.duedate)&&!isDone?'red':''}">${fmt(p.duedate)}${isOD(p.duedate)&&!isDone?' ⚠':''}</span></div>
+      </div>
+      ${p.needBalance?`<div class="balblock"><div class="ballbl">💳 尾款資訊</div><div class="balgrid">
+        <div class="bcell"><span class="blbl">尾款金額</span><span class="bval">${p.balanceAmount?'NT$ '+Number(p.balanceAmount).toLocaleString():'—'}</span></div>
+        <div class="bcell"><span class="blbl">支付日</span><span class="bval ${bod?'red':''}">${fmt(p.balanceDate)}${bod?' ⚠':''}</span></div>
+      </div></div>`:''}
+      ${p.note?`<div class="noteblock">${p.note.replace(/\n/g,'<br>')}</div>`:''}
+    </div>
+    <div class="cfoot"><span class="fuser">👤 ${p.lastOperator||'—'}</span><span class="ftime">${ago(p.updatedAt)}</span></div>
+  </div>`;
+}
+
+// ── render list ──
+function render(){
+  updateStats();
+  if(currentView==='list') renderList();
+  else renderCal();
+}
+
+function renderList(){
+  const q=(document.getElementById('searchInput').value||'').trim().toLowerCase();
+  let active=[...projects].filter(p=>p.status!=='已完成');
+  let done=[...projects].filter(p=>p.status==='已完成');
+
+  if(filter==='overdue') active=active.filter(p=>isOD(p.duedate)||(p.needBalance&&isOD(p.balanceDate)));
+  else if(filter!=='all') active=active.filter(p=>p.status===filter);
+  if(q){ active=active.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.owner||'').toLowerCase().includes(q)||(p.note||'').toLowerCase().includes(q));
+         done=done.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.owner||'').toLowerCase().includes(q)); }
+
+  sortList(active); sortList(done);
+
+  const el=document.getElementById('listView');
+  let html='';
+  if(!active.length && !q) html+=`<div class="empty"><div class="eico">📋</div><div class="etxt">尚無案廠資料<br>點右上角 ＋ 新增</div></div>`;
+  else html+=active.map(p=>cardHTML(p,false)).join('');
+
+  // done section
+  if(done.length){
+    html+=`<div class="section-head">
+      <div class="section-head-title">✅ 已完成（${done.length}）</div>
+      <div class="section-divider"></div>
+      <button class="done-toggle-btn" onclick="toggleDone()">${showDone?'收起':'展開'}</button>
+    </div>`;
+    if(showDone) html+=done.map(p=>cardHTML(p,true)).join('');
+  }
+  el.innerHTML=html;
+}
+
+function updateStats(){
+  const tot=projects.length;
+  const ing=projects.filter(p=>p.status==='進行中').length;
+  const dn=projects.filter(p=>p.status==='已完成').length;
+  const od=projects.filter(p=>(isOD(p.duedate)&&p.status!=='已完成')||(p.needBalance&&isOD(p.balanceDate))).length;
+  document.getElementById('statsBar').innerHTML=
     `<div class="spill"><span class="n">${tot}</span><span class="l">案廠</span></div>
      <div class="spill"><span class="n" style="color:var(--blue)">${ing}</span><span class="l">進行中</span></div>
      <div class="spill"><span class="n" style="color:var(--green)">${dn}</span><span class="l">完成</span></div>
      ${od?`<div class="spill"><span class="n" style="color:var(--red)">${od}</span><span class="l">逾期</span></div>`:''}`;
-
-  const el = document.getElementById('list');
-  if (!list.length) { el.innerHTML=`<div class="empty"><div class="eico">📋</div><div class="etxt">尚無案廠資料<br>點右上角 ＋ 新增</div></div>`; return; }
-
-  el.innerHTML = list.map(p=>{
-    const od=(isOD(p.duedate)&&p.status!=='已完成')||(p.needBalance&&isOD(p.balanceDate));
-    const bod=p.needBalance&&isOD(p.balanceDate);
-    return `<div class="card ${od?'overdue':''}">
-      <div class="cstripe"></div>
-      <div class="ctop">
-        <div class="cleft">
-          <div class="cname">${p.name}</div>
-          <div class="cchips">
-            <span class="chip ch-${p.status}">${p.status}</span>
-            <span class="chip ch-${p.priority}">${p.priority}優先</span>
-            ${p.hasDeposit?'<span class="chip ch-訂">已收訂</span>':''}
-          </div>
-        </div>
-        <div class="cacts">
-          <button class="actbtn" onclick="openEdit('${p.id}')">✏️</button>
-          <button class="actbtn" onclick="deleteProject('${p.id}')" style="color:var(--red)">🗑</button>
-        </div>
-      </div>
-      <div class="cbody">
-        <div class="irow">
-          <div class="icell"><span class="ilbl">負責人</span><span class="ival">${p.owner||'—'}</span></div>
-          <div class="icell"><span class="ilbl">預計完成</span><span class="ival ${isOD(p.duedate)&&p.status!=='已完成'?'red':''}">${fmt(p.duedate)}${isOD(p.duedate)&&p.status!=='已完成'?' ⚠':''}</span></div>
-        </div>
-        ${p.needBalance?`<div class="balblock"><div class="ballbl">💳 尾款資訊</div><div class="balgrid">
-          <div class="bcell"><span class="blbl">尾款金額</span><span class="bval">${p.balanceAmount?'NT$ '+Number(p.balanceAmount).toLocaleString():'—'}</span></div>
-          <div class="bcell"><span class="blbl">支付日</span><span class="bval ${bod?'red':''}">${fmt(p.balanceDate)}${bod?' ⚠':''}</span></div>
-        </div></div>`:''}
-        ${p.note?`<div class="noteblock">${p.note.replace(/\n/g,'<br>')}</div>`:''}
-      </div>
-      <div class="cfoot"><span class="fuser">👤 ${p.lastOperator||'—'}</span><span class="ftime">${ago(p.updatedAt)}</span></div>
-    </div>`;
-  }).join('');
 }
 
-window.setFilter = (btn,f) => { filter=f; document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); render(); };
+// ── CALENDAR ──
+function renderCal(){
+  const months=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  document.getElementById('calTitle').textContent=`${calYear} 年 ${months[calMonth]}`;
 
-window.openModal = (id=null) => {
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const daysInPrev=new Date(calYear,calMonth,0).getDate();
+  const td=today();
+
+  // build dot map
+  const dotMap={};
+  projects.forEach(p=>{
+    if(p.duedate&&p.duedate.startsWith(`${calYear}-${String(calMonth+1).padStart(2,'0')}`)){
+      const d=parseInt(p.duedate.split('-')[2]);
+      if(!dotMap[d])dotMap[d]=[];
+      dotMap[d].push({type:'due',name:p.name,status:p.status});
+    }
+    if(p.needBalance&&p.balanceDate&&p.balanceDate.startsWith(`${calYear}-${String(calMonth+1).padStart(2,'0')}`)){
+      const d=parseInt(p.balanceDate.split('-')[2]);
+      if(!dotMap[d])dotMap[d]=[];
+      dotMap[d].push({type:'bal',name:p.name});
+    }
+  });
+
+  const dows=['日','一','二','三','四','五','六'];
+  let html=dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  // prev month padding
+  for(let i=0;i<firstDay;i++){
+    const d=daysInPrev-firstDay+1+i;
+    html+=`<div class="cal-day other-month"><span class="cal-dn">${d}</span></div>`;
+  }
+
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=dateStr===td;
+    const dots=dotMap[d]||[];
+    const dotHTML=dots.slice(0,3).map(ev=>`<div class="cal-dot ${ev.type==='bal'?'dot-bal':'dot-due'}"></div>`).join('');
+    html+=`<div class="cal-day ${isToday?'today':''}" onclick="calDayClick(${d})">
+      <span class="cal-dn">${d}</span>
+      <div class="cal-dots">${dotHTML}</div>
+    </div>`;
+  }
+  document.getElementById('calGrid').innerHTML=html;
+
+  // Events this month
+  const evs=[];
+  projects.forEach(p=>{
+    if(p.duedate&&p.duedate.startsWith(`${calYear}-${String(calMonth+1).padStart(2,'0')}`))
+      evs.push({date:p.duedate,type:'due',name:p.name,owner:p.owner,status:p.status});
+    if(p.needBalance&&p.balanceDate&&p.balanceDate.startsWith(`${calYear}-${String(calMonth+1).padStart(2,'0')}`))
+      evs.push({date:p.balanceDate,type:'bal',name:p.name,amount:p.balanceAmount});
+  });
+  evs.sort((a,b)=>a.date.localeCompare(b.date));
+
+  if(!evs.length){
+    document.getElementById('calEvents').innerHTML=`<div class="cal-ev-head">本月無事件</div>`;
+    return;
+  }
+  document.getElementById('calEvents').innerHTML=
+    `<div class="cal-ev-head">本月事件</div>`+
+    evs.map(ev=>`<div class="cal-ev-card">
+      <div class="cal-ev-dot" style="background:${ev.type==='bal'?'var(--red)':'var(--accent)'}"></div>
+      <div class="cal-ev-info">
+        <div class="cal-ev-name">${ev.name}</div>
+        <div class="cal-ev-sub">${ev.type==='bal'?'💳 收尾款'+( ev.amount?' · NT$ '+Number(ev.amount).toLocaleString():''):'📅 預計完工'+(ev.owner?' · '+ev.owner:'')}</div>
+      </div>
+      <div class="cal-ev-date">${fmt(ev.date)}</div>
+    </div>`).join('');
+}
+
+window.calPrev=()=>{ calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCal(); };
+window.calNext=()=>{ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCal(); };
+window.calDayClick=()=>{};
+
+// ── view switch ──
+window.switchView=(v)=>{
+  currentView=v;
+  document.getElementById('listView').style.display=v==='list'?'':'none';
+  document.getElementById('calView').style.display=v==='cal'?'':'none';
+  document.getElementById('filterRow').style.display=v==='list'?'':'none';
+  document.getElementById('vt-list').classList.toggle('active',v==='list');
+  document.getElementById('vt-cal').classList.toggle('active',v==='cal');
+  render();
+};
+
+// ── filter / sort ──
+window.setFilter=(btn,f)=>{ filter=f; document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); render(); };
+window.setSort=(btn,s)=>{ sortBy=s; document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); render(); };
+window.toggleDone=()=>{ showDone=!showDone; render(); };
+
+// ── mark done / restore ──
+window.markDone=async(id)=>{
+  try{ await updateDoc(doc(db,"projects",id),{status:'已完成',updatedAt:serverTimestamp()}); toast('✅ 已移至完成區'); }
+  catch{ toast('❌ 操作失敗'); }
+};
+window.restoreProject=async(id)=>{
+  try{ await updateDoc(doc(db,"projects",id),{status:'進行中',updatedAt:serverTimestamp()}); toast('↩ 已移回進行中'); }
+  catch{ toast('❌ 操作失敗'); }
+};
+
+// ── modal ──
+window.openModal=(id=null)=>{
   editId=id; const p=id?projects.find(x=>x.id===id):null;
   document.getElementById('modalTitle').textContent=id?'編輯案廠':'新增案廠';
-  ['f_name','f_owner','f_note','f_operator'].forEach(k=>document.getElementById(k).value=p?.[k.replace('f_','')]||'');
   document.getElementById('f_name').value=p?.name||'';
   document.getElementById('f_status').value=p?.status||'待跟進';
   document.getElementById('f_priority').value=p?.priority||'中';
@@ -486,7 +564,7 @@ window.openModal = (id=null) => {
   document.getElementById('f_duedate').value=p?.duedate||'';
   document.getElementById('f_note').value=p?.note||'';
   document.getElementById('f_operator').value='';
-  const dep=p?.hasDeposit||false, bal=p?.needBalance||false;
+  const dep=p?.hasDeposit||false,bal=p?.needBalance||false;
   document.getElementById('toggle_deposit').className='toggle'+(dep?' on':'');
   document.getElementById('toggle_balance').className='toggle'+(bal?' on':'');
   document.getElementById('depositSection').style.display=dep?'':'none';
@@ -497,22 +575,30 @@ window.openModal = (id=null) => {
 };
 window.openEdit=id=>window.openModal(id);
 window.closeModal=()=>{ document.getElementById('modalOverlay').classList.remove('open'); editId=null; };
-window.overlayClick=e=>{ if(e.target===document.getElementById('modalOverlay')) window.closeModal(); };
+window.overlayClick=e=>{ if(e.target===document.getElementById('modalOverlay'))window.closeModal(); };
 window.toggleDeposit=()=>{ const t=document.getElementById('toggle_deposit'),on=!t.classList.contains('on'); t.className='toggle'+(on?' on':''); document.getElementById('depositSection').style.display=on?'':'none'; if(!on){document.getElementById('toggle_balance').className='toggle';document.getElementById('balanceSection').hidden=true;} };
 window.toggleBalance=()=>{ const t=document.getElementById('toggle_balance'),on=!t.classList.contains('on'); t.className='toggle'+(on?' on':''); document.getElementById('balanceSection').hidden=!on; };
 
-window.saveProject = async () => {
+// ── save ──
+window.saveProject=async()=>{
   const name=document.getElementById('f_name').value.trim(); if(!name){toast('請輸入案廠名稱');return;}
   const op=document.getElementById('f_operator').value.trim()||'未知';
   const hd=document.getElementById('toggle_deposit').classList.contains('on');
   const nb=document.getElementById('toggle_balance').classList.contains('on');
   const data={name,status:document.getElementById('f_status').value,priority:document.getElementById('f_priority').value,owner:document.getElementById('f_owner').value.trim(),duedate:document.getElementById('f_duedate').value,note:document.getElementById('f_note').value.trim(),hasDeposit:hd,needBalance:hd&&nb,balanceAmount:document.getElementById('f_balance_amount').value,balanceDate:document.getElementById('f_balance_date').value,lastOperator:op,updatedAt:serverTimestamp()};
-  try { if(editId){await updateDoc(doc(db,"projects",editId),data);toast('✅ 已更新');}else{await addDoc(col,{...data,createdAt:serverTimestamp()});toast('✅ 已新增');} window.closeModal(); }
-  catch { toast('❌ 儲存失敗'); }
+  try{
+    if(editId){await updateDoc(doc(db,"projects",editId),data);toast('✅ 已更新');}
+    else{await addDoc(col,{...data,createdAt:serverTimestamp()});toast('✅ 已新增');}
+    window.closeModal();
+  }catch{toast('❌ 儲存失敗');}
 };
-window.deleteProject = async id => { if(!confirm('確定刪除？'))return; try{await deleteDoc(doc(db,"projects",id));toast('已刪除');}catch{toast('❌ 刪除失敗');} };
 
-function toast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2400); }
+// ── delete ──
+window.deleteProject=async id=>{ if(!confirm('確定刪除？'))return; try{await deleteDoc(doc(db,"projects",id));toast('已刪除');}catch{toast('❌ 刪除失敗');} };
+
+// ── toast ──
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2400); }
+
 document.getElementById('searchInput').addEventListener('input',render);
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
