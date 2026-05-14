@@ -98,6 +98,12 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 .ch-待確認{background:rgba(138,90,16,0.12);color:var(--amber);}
 .ch-已完成{background:rgba(46,122,80,0.12);color:var(--green);}
 .ch-暫停{background:rgba(184,50,50,0.10);color:var(--red);}
+.ch-已下單{background:rgba(48,88,160,0.10);color:var(--blue);}
+.ch-完成{background:rgba(46,122,80,0.12);color:var(--green);}
+.ch-待追蹤{background:rgba(138,90,16,0.12);color:var(--amber);}
+.ch-維修{background:rgba(180,140,0,0.15);color:#7a5e00;}
+.card.repair{background:rgba(255,245,180,0.72);border:1.5px solid rgba(210,175,0,0.30);box-shadow:0 1px 3px rgba(180,150,0,0.08),0 4px 14px rgba(180,150,0,0.07);}
+.card.repair .cstripe{background:linear-gradient(90deg,#c8aa00,#e0c840);}
 .ch-高{background:rgba(184,50,50,0.10);color:var(--red);}
 .ch-中{background:rgba(138,90,16,0.10);color:var(--amber);}
 .ch-低{background:rgba(46,122,80,0.10);color:var(--green);}
@@ -207,10 +213,10 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
   <div class="stats-row" id="statsBar"></div>
   <div class="frow" id="filterRow">
     <button class="fbtn active" onclick="setFilter(this,'all')">全部</button>
-    <button class="fbtn" onclick="setFilter(this,'待跟進')">待跟進</button>
-    <button class="fbtn" onclick="setFilter(this,'進行中')">進行中</button>
-    <button class="fbtn" onclick="setFilter(this,'待確認')">待確認</button>
-    <button class="fbtn" onclick="setFilter(this,'暫停')">暫停</button>
+    <button class="fbtn" onclick="setFilter(this,'已下單')">已下單</button>
+    <button class="fbtn" onclick="setFilter(this,'完成')">完成</button>
+    <button class="fbtn" onclick="setFilter(this,'待追蹤')">待追蹤</button>
+    <button class="fbtn" onclick="setFilter(this,'維修')">🔧 維修</button>
     <button class="fbtn" onclick="setFilter(this,'overdue')">⚠ 逾期</button>
   </div>
   <div class="sort-wrap" id="sortWrap">
@@ -259,8 +265,8 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
         <div class="fgrp">
           <label class="flbl">目前狀態</label>
           <select class="fselect" id="f_status">
-            <option>待跟進</option><option>進行中</option>
-            <option>待確認</option><option>已完成</option><option>暫停</option>
+            <option>已下單</option><option>完成</option>
+            <option>待追蹤</option><option>維修</option>
           </select>
         </div>
         <div class="fgrp">
@@ -380,7 +386,8 @@ function sortList(list){
 function cardHTML(p, isDone=false){
   const od=(isOD(p.duedate)&&!isDone)||(p.needBalance&&isOD(p.balanceDate));
   const bod=p.needBalance&&isOD(p.balanceDate);
-  return`<div class="card ${od?'overdue':''} ${isDone?'done-card':''}">
+  const isRepair=p.status==='維修';
+    return`<div class="card ${od?'overdue':''} ${isDone?'done-card':''} ${isRepair?'repair':''}">
     <div class="cstripe"></div>
     <div class="ctop">
       <div class="cleft">
@@ -424,8 +431,8 @@ function render(){
 
 function renderList(){
   const q=(document.getElementById('searchInput').value||'').trim().toLowerCase();
-  let active=[...projects].filter(p=>p.status!=='已完成');
-  let done=[...projects].filter(p=>p.status==='已完成');
+  let active=[...projects].filter(p=>p.status!=='完成');
+  let done=[...projects].filter(p=>p.status==='完成');
 
   if(filter==='overdue') active=active.filter(p=>isOD(p.duedate)||(p.needBalance&&isOD(p.balanceDate)));
   else if(filter!=='all') active=active.filter(p=>p.status===filter);
@@ -453,13 +460,15 @@ function renderList(){
 
 function updateStats(){
   const tot=projects.length;
-  const ing=projects.filter(p=>p.status==='進行中').length;
-  const dn=projects.filter(p=>p.status==='已完成').length;
-  const od=projects.filter(p=>(isOD(p.duedate)&&p.status!=='已完成')||(p.needBalance&&isOD(p.balanceDate))).length;
+  const ing=projects.filter(p=>p.status==='已下單').length;
+  const dn=projects.filter(p=>p.status==='完成').length;
+  const rep=projects.filter(p=>p.status==='維修').length;
+  const od=projects.filter(p=>(isOD(p.duedate)&&p.status!=='完成')||(p.needBalance&&isOD(p.balanceDate))).length;
   document.getElementById('statsBar').innerHTML=
     `<div class="spill"><span class="n">${tot}</span><span class="l">案廠</span></div>
-     <div class="spill"><span class="n" style="color:var(--blue)">${ing}</span><span class="l">進行中</span></div>
+     <div class="spill"><span class="n" style="color:var(--blue)">${ing}</span><span class="l">已下單</span></div>
      <div class="spill"><span class="n" style="color:var(--green)">${dn}</span><span class="l">完成</span></div>
+     ${rep?`<div class="spill"><span class="n" style="color:#7a5e00">${rep}</span><span class="l">🔧 維修</span></div>`:''}
      ${od?`<div class="spill"><span class="n" style="color:var(--red)">${od}</span><span class="l">逾期</span></div>`:''}`;
 }
 
@@ -582,11 +591,11 @@ window.toggleDone=()=>{ showDone=!showDone; render(); };
 
 // ── mark done / restore ──
 window.markDone=async(id)=>{
-  try{ await updateDoc(doc(db,"projects",id),{status:'已完成',updatedAt:serverTimestamp()}); toast('✅ 已移至完成區'); }
+  try{ await updateDoc(doc(db,"projects",id),{status:'完成',updatedAt:serverTimestamp()}); toast('✅ 已移至完成區'); }
   catch{ toast('❌ 操作失敗'); }
 };
 window.restoreProject=async(id)=>{
-  try{ await updateDoc(doc(db,"projects",id),{status:'進行中',updatedAt:serverTimestamp()}); toast('↩ 已移回進行中'); }
+  try{ await updateDoc(doc(db,"projects",id),{status:'待追蹤',updatedAt:serverTimestamp()}); toast('↩ 已移回進行中'); }
   catch{ toast('❌ 操作失敗'); }
 };
 
@@ -594,7 +603,7 @@ window.restoreProject=async(id)=>{
 let draftData = null;
 function loadFormDraft(p) {
   document.getElementById('f_name').value=p?.name||'';
-  document.getElementById('f_status').value=p?.status||'待跟進';
+  document.getElementById('f_status').value=p?.status||'已下單';
   document.getElementById('f_priority').value=p?.priority||'中';
   document.getElementById('f_owner').value=p?.owner||'';
   document.getElementById('f_duedate').value=p?.duedate||'';
