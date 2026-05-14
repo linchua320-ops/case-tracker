@@ -185,6 +185,30 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 .savebtn{width:100%;padding:15px;border-radius:16px;background:var(--accent);border:none;color:#fff;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;letter-spacing:0.3px;box-shadow:0 4px 18px rgba(92,58,31,0.28);transition:transform 0.12s,opacity 0.12s;}
 .savebtn:active{transform:scale(0.97);opacity:0.9;}
 
+/* DAY PREVIEW PANEL */
+.day-overlay{position:fixed;inset:0;z-index:200;background:rgba(26,18,8,0.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.22s;}
+.day-overlay.open{opacity:1;pointer-events:all;}
+.day-panel{width:100%;max-width:560px;background:var(--bg);border-radius:28px 28px 0 0;padding-bottom:env(safe-area-inset-bottom,24px);transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);max-height:80vh;overflow-y:auto;}
+.day-overlay.open .day-panel{transform:translateY(0);}
+.day-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:14px auto 0;}
+.day-head{display:flex;align-items:center;justify-content:space-between;padding:14px 22px 10px;}
+.day-head-title{font-size:18px;font-weight:800;letter-spacing:-0.3px;}
+.day-head-close{width:30px;height:30px;border-radius:50%;background:var(--sur2);border:none;cursor:pointer;font-size:15px;color:var(--text2);display:flex;align-items:center;justify-content:center;}
+.day-list{display:flex;flex-direction:column;gap:10px;padding:4px 16px 10px;}
+.day-item{background:var(--surface);border-radius:18px;overflow:hidden;box-shadow:0 1px 3px rgba(60,30,10,0.07);}
+.day-item.repair-item{background:rgba(255,245,180,0.72);border:1.5px solid rgba(210,175,0,0.30);}
+.day-item-stripe{height:3px;}
+.day-item-body{padding:13px 15px 12px;display:flex;flex-direction:column;gap:7px;}
+.day-item-name{font-size:16px;font-weight:700;line-height:1.25;}
+.day-item-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.day-item-meta{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;}
+.day-item-cell{display:flex;flex-direction:column;gap:1px;}
+.day-item-lbl{font-size:10px;font-weight:500;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase;}
+.day-item-val{font-size:12px;font-weight:500;color:var(--text2);}
+.day-item-note{font-size:12px;color:var(--text2);background:rgba(124,85,53,0.06);border-radius:8px;padding:7px 10px;line-height:1.6;}
+.day-item-editbtn{align-self:flex-end;padding:5px 14px;border-radius:var(--rchip);background:var(--sur2);border:none;font-size:12px;font-weight:600;color:var(--accent);cursor:pointer;font-family:inherit;}
+.day-empty{text-align:center;padding:30px 20px;color:var(--text3);font-size:14px;}
+
 /* EMPTY / TOAST */
 .empty{text-align:center;padding:70px 20px;color:var(--text3);}
 .eico{font-size:52px;margin-bottom:14px;}
@@ -247,6 +271,18 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- DAY PREVIEW PANEL -->
+<div class="day-overlay" id="dayOverlay" onclick="closeDayPanel(event)">
+  <div class="day-panel" id="dayPanel">
+    <div class="day-handle"></div>
+    <div class="day-head">
+      <span class="day-head-title" id="dayPanelTitle"></span>
+      <button class="day-head-close" onclick="closeDayPanel()">✕</button>
+    </div>
+    <div class="day-list" id="dayPanelList"></div>
+  </div>
+</div>
 
 <!-- MODAL -->
 <div class="overlay" id="modalOverlay">
@@ -675,6 +711,60 @@ window.deleteProject=async id=>{ if(!confirm('確定刪除？'))return; try{awai
 
 // ── toast ──
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2400); }
+
+// ── day preview panel ──
+window.closeDayPanel=(e)=>{
+  if(e && e.target!==document.getElementById('dayOverlay')) return;
+  document.getElementById('dayOverlay').classList.remove('open');
+};
+
+function stripeColor(status){
+  const map={'已下單':'var(--blue)','完成':'var(--green)','待追蹤':'var(--amber)','維修':'linear-gradient(90deg,#c8aa00,#e0c840)'};
+  return map[status]||'var(--border)';
+}
+
+window.calDayClick=(d)=>{
+  const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  document.getElementById('dayPanelTitle').textContent=`${calMonth+1}月${d}日`;
+
+  const items=[];
+  projects.forEach(p=>{
+    const events=[];
+    if(p.duedate===dateStr) events.push({type:'due',label:'📅 預計完工'});
+    if(p.needBalance&&p.balanceDate===dateStr) events.push({type:'bal',label:'💳 尾款到期'});
+    if(events.length) items.push({p,events});
+  });
+
+  const list=document.getElementById('dayPanelList');
+  if(!items.length){
+    list.innerHTML=`<div class="day-empty">這天沒有排程事件</div>`;
+  } else {
+    list.innerHTML=items.map(({p,events})=>{
+      const isRepair=p.status==='維修';
+      const badges=events.map(ev=>`<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;display:inline-block;${ev.type==='bal'?'background:rgba(184,50,50,0.10);color:var(--red)':'background:rgba(124,85,53,0.10);color:var(--accent)'}">${ev.label}</span>`).join('');
+      const stripe=isRepair?'linear-gradient(90deg,#c8aa00,#e0c840)':stripeColor(p.status);
+      return `<div class="day-item ${isRepair?'repair-item':''}">
+        <div class="day-item-stripe" style="background:${stripe}"></div>
+        <div class="day-item-body">
+          <div class="day-item-name">${p.name}</div>
+          <div class="day-item-chips">
+            <span class="chip ch-${p.status}">${p.status}</span>
+            <span class="chip ch-${p.priority}">${p.priority}優先</span>
+            ${p.hasDeposit?'<span class="chip ch-訂">已收訂</span>':''}
+            ${badges}
+          </div>
+          <div class="day-item-meta">
+            <div class="day-item-cell"><span class="day-item-lbl">負責人</span><span class="day-item-val">${p.owner||'—'}</span></div>
+            ${p.needBalance&&p.balanceAmount?`<div class="day-item-cell"><span class="day-item-lbl">尾款金額</span><span class="day-item-val">NT$ ${Number(p.balanceAmount).toLocaleString()}</span></div>`:'<div></div>'}
+          </div>
+          ${p.note?`<div class="day-item-note">${p.note.replace(/\n/g,'<br>')}</div>`:''}
+          <button class="day-item-editbtn" onclick="closeDayPanel();openEdit('${p.id}')">✏️ 編輯</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('dayOverlay').classList.add('open');
+};
 
 document.getElementById('searchInput').addEventListener('input',render);
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
