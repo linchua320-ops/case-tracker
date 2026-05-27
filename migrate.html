@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>資料搬移</title>
+<style>
+body{font-family:-apple-system,'Noto Sans TC',sans-serif;background:#f7f3ee;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}
+.box{background:#fff;border-radius:22px;padding:32px 28px;max-width:400px;width:100%;box-shadow:0 4px 24px rgba(60,30,10,0.10);text-align:center;display:flex;flex-direction:column;gap:20px;}
+h2{font-size:22px;font-weight:900;color:#1a1208;margin:0;}
+p{font-size:14px;color:#5c4a35;line-height:1.7;margin:0;}
+.btn{padding:14px;border-radius:14px;background:#7c5535;border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;width:100%;font-family:inherit;transition:opacity 0.15s;}
+.btn:active{opacity:0.85;}
+.btn:disabled{background:#a8917a;cursor:not-allowed;}
+.log{background:#f0ebe3;border-radius:14px;padding:14px;text-align:left;font-size:13px;color:#5c4a35;line-height:1.8;max-height:220px;overflow-y:auto;display:none;}
+.done-msg{background:rgba(46,122,80,0.10);border-radius:14px;padding:14px;color:#2e7a50;font-weight:700;font-size:14px;display:none;}
+</style>
+</head>
+<body>
+<div class="box">
+  <div style="font-size:48px">📦</div>
+  <h2>資料搬移工具</h2>
+  <p>將舊版共用資料複製到<br><strong>蔡恩霖</strong> 的個人空間<br><br>⚠️ 請只執行一次</p>
+  <button class="btn" id="migrateBtn" onclick="doMigrate()">開始搬移</button>
+  <div class="log" id="log"></div>
+  <div class="done-msg" id="doneMsg">✅ 搬移完成！所有資料已複製到您的帳號<br>可以關閉此頁面了</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSyCr3QybupoUWt1sng9V1_uUP4LthCgFsV0",
+  authDomain:"lin320-c88ba.firebaseapp.com",
+  databaseURL:"https://lin320-c88ba-default-rtdb.firebaseio.com",
+  projectId:"lin320-c88ba",
+  storageBucket:"lin320-c88ba.firebasestorage.app",
+  messagingSenderId:"345326399405",
+  appId:"1:345326399405:web:c7f8bd56ddff2f4ff5bb24"
+});
+const db = getFirestore(app);
+
+function log(msg){
+  const el=document.getElementById('log');
+  el.style.display='block';
+  el.innerHTML+=msg+'<br>';
+  el.scrollTop=el.scrollHeight;
+}
+
+window.doMigrate = async()=>{
+  const btn=document.getElementById('migrateBtn');
+  btn.disabled=true; btn.textContent='搬移中…';
+
+  try{
+    // Read old collection
+    const oldCol=collection(db,'projects');
+    const snap=await getDocs(oldCol);
+
+    if(snap.empty){ log('⚠️ 舊資料是空的，沒有資料需要搬移'); btn.textContent='完成'; return; }
+
+    log(`找到 ${snap.size} 筆舊資料，開始複製…`);
+
+    // Get or create userId for 蔡恩霖
+    // Use the same logic as the app: check localStorage first, else create
+    let uid = localStorage.getItem('casetracker_uid');
+    if(!uid){
+      uid='u_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);
+      localStorage.setItem('casetracker_uid', uid);
+      localStorage.setItem('casetracker_uname', '蔡恩霖');
+    }
+    log(`使用者 ID：${uid}`);
+
+    const newCol=collection(db,'users',uid,'projects');
+    let count=0;
+
+    for(const d of snap.docs){
+      const data=d.data();
+      // Remove id field if present, keep all other fields
+      const {id:_,...rest}=data;
+      await addDoc(newCol,{...rest, migratedAt:serverTimestamp()});
+      count++;
+      log(`✓ 已複製：${data.name||'(未命名)'}`);
+    }
+
+    log(`\n🎉 完成！共搬移 ${count} 筆資料`);
+    document.getElementById('doneMsg').style.display='block';
+    btn.textContent='搬移完成';
+  }catch(e){
+    log('❌ 錯誤：'+e.message);
+    btn.disabled=false; btn.textContent='重試';
+  }
+};
+</script>
+</body>
+</html>
