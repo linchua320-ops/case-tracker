@@ -215,9 +215,38 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 .etxt{font-size:15px;font-weight:300;line-height:1.7;}
 .toast{position:fixed;bottom:calc(88px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(14px);background:var(--text);color:#fff;padding:10px 20px;border-radius:var(--rchip);font-size:13px;font-weight:500;z-index:400;opacity:0;pointer-events:none;transition:opacity 0.18s,transform 0.18s;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* LOGIN SCREEN */
+.login-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:32px 24px;}
+.login-box{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:28px;}
+.login-icon{font-size:56px;line-height:1;}
+.login-title{font-size:28px;font-weight:900;letter-spacing:-0.5px;text-align:center;}
+.login-sub{font-size:14px;color:var(--text3);text-align:center;line-height:1.6;margin-top:-16px;}
+.login-form{width:100%;display:flex;flex-direction:column;gap:12px;}
+.login-input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:16px;color:var(--text);padding:14px 16px;font-size:16px;font-family:inherit;outline:none;-webkit-appearance:none;transition:border-color 0.15s;text-align:center;}
+.login-input:focus{border-color:var(--accent);}
+.login-input::placeholder{color:var(--text3);}
+.login-btn{width:100%;padding:15px;border-radius:16px;background:var(--accent);border:none;color:#fff;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;box-shadow:0 4px 18px rgba(92,58,31,0.28);transition:transform 0.12s,opacity 0.12s;}
+.login-btn:active{transform:scale(0.97);opacity:0.9;}
+/* USER badge in header */
+.user-badge{display:flex;align-items:center;gap:6px;background:var(--sur2);border:1px solid var(--border);border-radius:var(--rchip);padding:5px 12px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;max-width:120px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.user-badge:active{background:var(--border);}
 </style>
 </head>
 <body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-icon">🏭</div>
+    <div class="login-title">案廠進度</div>
+    <div class="login-sub">請輸入您的名稱<br>首次登入後將自動記住</div>
+    <div class="login-form">
+      <input class="login-input" id="loginInput" type="text" placeholder="輸入您的名稱" maxlength="20" autocomplete="off">
+      <button class="login-btn" onclick="doLogin()">進入</button>
+    </div>
+  </div>
+</div>
 
 <header class="header">
   <div class="hinner">
@@ -225,6 +254,7 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
       <div class="logo-title">案廠進度</div>
       <div class="logo-sub">PROJECT TRACKER</div>
     </div>
+    <div id="userBadge" class="user-badge" onclick="switchUser()" style="display:none">👤 <span id="userBadgeName"></span></div>
     <div class="hbtns">
       <div class="view-toggle">
         <button class="vtbtn active" id="vt-list" onclick="switchView('list')">☰</button>
@@ -373,16 +403,59 @@ const app = initializeApp({
   appId:"1:345326399405:web:c7f8bd56ddff2f4ff5bb24"
 });
 const db = getFirestore(app);
-const col = collection(db, "projects");
 
 let projects=[], filter='all', sortBy='overdue', editId=null;
 let currentView='list', showDone=false;
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
+let currentUserId=null, currentUserName=null, col=null, unsubscribe=null;
 
-document.getElementById('listView').innerHTML=`<div class="empty"><div class="eico">⏳</div><div class="etxt">連線中…</div></div>`;
+// ── USER LOGIN ──
+function getUserKey(){ return localStorage.getItem('casetracker_uid'); }
+function getUserName(){ return localStorage.getItem('casetracker_uname'); }
 
-onSnapshot(col, s=>{ projects=s.docs.map(d=>({id:d.id,...d.data()})); render(); },
-  ()=>{ document.getElementById('listView').innerHTML=`<div class="empty"><div class="eico">⚠️</div><div class="etxt">連線失敗</div></div>`; });
+function doLogin(){
+  const name=document.getElementById('loginInput').value.trim();
+  if(!name){ document.getElementById('loginInput').focus(); return; }
+  // Create stable userId from name (slug) + random suffix if new
+  let uid=localStorage.getItem('casetracker_uid');
+  if(!uid){ uid='u_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6); }
+  localStorage.setItem('casetracker_uid', uid);
+  localStorage.setItem('casetracker_uname', name);
+  startApp(uid, name);
+}
+window.doLogin=doLogin;
+
+// Allow pressing Enter on login
+document.getElementById('loginInput').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+
+function startApp(uid, name){
+  currentUserId=uid; currentUserName=name;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('userBadge').style.display='flex';
+  document.getElementById('userBadgeName').textContent=name;
+
+  // Subscribe to this user's projects subcollection
+  if(unsubscribe) unsubscribe();
+  col = collection(db, 'users', uid, 'projects');
+  document.getElementById('listView').innerHTML=`<div class="empty"><div class="eico">⏳</div><div class="etxt">連線中…</div></div>`;
+  unsubscribe = onSnapshot(col, s=>{ projects=s.docs.map(d=>({id:d.id,...d.data()})); render(); },
+    ()=>{ document.getElementById('listView').innerHTML=`<div class="empty"><div class="eico">⚠️</div><div class="etxt">連線失敗</div></div>`; });
+}
+
+window.switchUser=()=>{
+  if(!confirm('切換使用者將會登出，確定嗎？')) return;
+  localStorage.removeItem('casetracker_uid');
+  localStorage.removeItem('casetracker_uname');
+  if(unsubscribe){ unsubscribe(); unsubscribe=null; }
+  document.getElementById('userBadge').style.display='none';
+  document.getElementById('loginInput').value='';
+  document.getElementById('loginScreen').style.display='flex';
+};
+
+// Auto-login if already have uid+name
+const _savedUid=getUserKey(), _savedName=getUserName();
+if(_savedUid && _savedName){ startApp(_savedUid,_savedName); }
+else{ document.getElementById('loginScreen').style.display='flex'; }
 
 // ── helpers ──
 const today=()=>new Date().toISOString().split('T')[0];
@@ -627,11 +700,11 @@ window.toggleDone=()=>{ showDone=!showDone; render(); };
 
 // ── mark done / restore ──
 window.markDone=async(id)=>{
-  try{ await updateDoc(doc(db,"projects",id),{status:'完成',updatedAt:serverTimestamp()}); toast('✅ 已移至完成區'); }
+  try{ await updateDoc(doc(db,"users",currentUserId,"projects",id),{status:'完成',updatedAt:serverTimestamp()}); toast('✅ 已移至完成區'); }
   catch{ toast('❌ 操作失敗'); }
 };
 window.restoreProject=async(id)=>{
-  try{ await updateDoc(doc(db,"projects",id),{status:'待追蹤',updatedAt:serverTimestamp()}); toast('↩ 已移回進行中'); }
+  try{ await updateDoc(doc(db,"users",currentUserId,"projects",id),{status:'待追蹤',updatedAt:serverTimestamp()}); toast('↩ 已移回進行中'); }
   catch{ toast('❌ 操作失敗'); }
 };
 
@@ -700,14 +773,14 @@ window.saveProject=async()=>{
   const nb=document.getElementById('toggle_balance').classList.contains('on');
   const data={name,status:document.getElementById('f_status').value,priority:document.getElementById('f_priority').value,owner:document.getElementById('f_owner').value.trim(),duedate:document.getElementById('f_duedate').value,note:document.getElementById('f_note').value.trim(),hasDeposit:hd,needBalance:hd&&nb,balanceAmount:document.getElementById('f_balance_amount').value,balanceDate:document.getElementById('f_balance_date').value,lastOperator:op,updatedAt:serverTimestamp()};
   try{
-    if(editId){await updateDoc(doc(db,"projects",editId),data);toast('✅ 已更新');}
+    if(editId){await updateDoc(doc(db,"users",currentUserId,"projects",editId),data);toast('✅ 已更新');}
     else{await addDoc(col,{...data,createdAt:serverTimestamp()});toast('✅ 已新增');}
     draftData=null; window.closeModal();
   }catch{toast('❌ 儲存失敗');}
 };
 
 // ── delete ──
-window.deleteProject=async id=>{ if(!confirm('確定刪除？'))return; try{await deleteDoc(doc(db,"projects",id));toast('已刪除');}catch{toast('❌ 刪除失敗');} };
+window.deleteProject=async id=>{ if(!confirm('確定刪除？'))return; try{await deleteDoc(doc(db,"users",currentUserId,"projects",id));toast('已刪除');}catch{toast('❌ 刪除失敗');} };
 
 // ── toast ──
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2400); }
