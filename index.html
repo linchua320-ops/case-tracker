@@ -209,6 +209,42 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 .day-item-editbtn{align-self:flex-end;padding:5px 14px;border-radius:var(--rchip);background:var(--sur2);border:none;font-size:12px;font-weight:600;color:var(--accent);cursor:pointer;font-family:inherit;}
 .day-empty{text-align:center;padding:30px 20px;color:var(--text3);font-size:14px;}
 
+/* DASHBOARD */
+.dash-wrap{padding:14px 16px 110px;max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:16px;}
+.dash-title{font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.8px;text-transform:uppercase;padding:4px 0;}
+.dash-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.dash-card{background:var(--surface);border-radius:18px;padding:16px;box-shadow:0 1px 3px rgba(60,30,10,0.07);}
+.dash-card-val{font-size:28px;font-weight:900;line-height:1;}
+.dash-card-lbl{font-size:11px;color:var(--text3);margin-top:4px;font-weight:500;}
+.dash-bar-wrap{background:var(--surface);border-radius:18px;padding:18px;box-shadow:0 1px 3px rgba(60,30,10,0.07);}
+.dash-bar-title{font-size:13px;font-weight:700;margin-bottom:14px;}
+.dash-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.dash-bar-lbl{font-size:12px;font-weight:500;color:var(--text2);width:52px;flex-shrink:0;text-align:right;}
+.dash-bar-track{flex:1;height:8px;background:var(--sur2);border-radius:4px;overflow:hidden;}
+.dash-bar-fill{height:100%;border-radius:4px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1);}
+.dash-bar-num{font-size:12px;font-weight:700;color:var(--text2);width:24px;flex-shrink:0;}
+.dash-money{background:var(--surface);border-radius:18px;padding:18px;box-shadow:0 1px 3px rgba(60,30,10,0.07);display:flex;flex-direction:column;gap:12px;}
+.dash-money-row{display:flex;align-items:center;justify-content:space-between;}
+.dash-money-lbl{font-size:13px;color:var(--text2);}
+.dash-money-val{font-size:15px;font-weight:700;}
+.dash-divider{height:1px;background:var(--border);}
+
+/* PHOTO */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px;}
+.photo-thumb{aspect-ratio:1;border-radius:10px;overflow:hidden;position:relative;background:var(--sur2);cursor:pointer;}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;}
+.photo-del{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,0.55);border:none;color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.photo-add{aspect-ratio:1;border-radius:10px;border:1.5px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;background:transparent;font-family:inherit;}
+.photo-add-ico{font-size:22px;}
+.photo-add-lbl{font-size:10px;color:var(--text3);font-weight:500;}
+.upload-progress{height:3px;background:var(--sur2);border-radius:2px;overflow:hidden;margin-top:4px;}
+.upload-bar{height:100%;background:var(--accent);width:0%;transition:width 0.3s;}
+
+/* CARD compact */
+.card-photos{display:flex;gap:5px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none;}
+.card-photos::-webkit-scrollbar{display:none;}
+.cphoto{width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;cursor:pointer;}
+
 /* EMPTY / TOAST */
 .empty{text-align:center;padding:70px 20px;color:var(--text3);}
 .eico{font-size:52px;margin-bottom:14px;}
@@ -225,6 +261,7 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 .login-form{width:100%;display:flex;flex-direction:column;gap:12px;}
 .login-input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:16px;color:var(--text);padding:14px 16px;font-size:16px;font-family:inherit;outline:none;-webkit-appearance:none;transition:border-color 0.15s;text-align:center;}
 .login-input:focus{border-color:var(--accent);}
+.login-input:focus{border-color:var(--accent);}
 .login-input::placeholder{color:var(--text3);}
 .login-btn{width:100%;padding:15px;border-radius:16px;background:var(--accent);border:none;color:#fff;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;box-shadow:0 4px 18px rgba(92,58,31,0.28);transition:transform 0.12s,opacity 0.12s;}
 .login-btn:active{transform:scale(0.97);opacity:0.9;}
@@ -240,9 +277,11 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
   <div class="login-box">
     <div class="login-icon">🏭</div>
     <div class="login-title">案廠進度</div>
-    <div class="login-sub">請輸入您的名稱<br>首次登入後將自動記住</div>
+    <div class="login-sub">輸入名稱與密碼<br>任何裝置都能存取同一份資料</div>
     <div class="login-form">
-      <input class="login-input" id="loginInput" type="text" placeholder="輸入您的名稱" maxlength="20" autocomplete="off">
+      <input class="login-input" id="loginInput" type="text" placeholder="使用者名稱" maxlength="20" autocomplete="off">
+      <input class="login-input" id="loginPwd" type="password" placeholder="密碼" maxlength="30" autocomplete="off">
+      <div id="loginError" style="font-size:13px;color:#b83232;text-align:center;display:none;">名稱或密碼不能為空</div>
       <button class="login-btn" onclick="doLogin()">進入</button>
     </div>
   </div>
@@ -259,6 +298,7 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
       <div class="view-toggle">
         <button class="vtbtn active" id="vt-list" onclick="switchView('list')">☰</button>
         <button class="vtbtn" id="vt-cal" onclick="switchView('cal')">📅</button>
+        <button class="vtbtn" id="vt-dash" onclick="switchView('dash')">📊</button>
       </div>
       <button class="add-btn" onclick="openModal()">＋</button>
     </div>
@@ -275,12 +315,12 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
   </div>
   <div class="sort-wrap" id="sortWrap">
     <button class="sort-trigger has-sort" id="sortTrigger" onclick="toggleSortMenu()">
-      ↕ 排序：<span id="sortLabel">逾期優先</span><span class="sort-arrow">▾</span>
+      ↕ 排序：<span id="sortLabel">預計完工日</span><span class="sort-arrow">▾</span>
     </button>
     <div class="sort-dropdown" id="sortDropdown">
-      <button class="sort-opt active" id="sort-overdue" onclick="setSort('overdue')"><span class="sort-check">✓</span>⚠ 逾期優先</button>
+      <button class="sort-opt" id="sort-overdue" onclick="setSort('overdue')"><span class="sort-check"></span>⚠ 逾期優先</button>
       <button class="sort-opt" id="sort-priority" onclick="setSort('priority')"><span class="sort-check"></span>優先級</button>
-      <button class="sort-opt" id="sort-duedate" onclick="setSort('duedate')"><span class="sort-check"></span>預計完工日</button>
+      <button class="sort-opt active" id="sort-duedate" onclick="setSort('duedate')"><span class="sort-check">✓</span>預計完工日</button>
     </div>
   </div>
   <div class="hdivider"></div>
@@ -298,6 +338,17 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
   </div>
   <div class="cal-grid" id="calGrid"></div>
   <div class="cal-events" id="calEvents"></div>
+</div>
+
+<!-- DASHBOARD VIEW -->
+<div class="dash-wrap" id="dashView" style="display:none">
+  <div class="dash-title">總覽</div>
+  <div class="dash-grid" id="dashGrid"></div>
+  <div class="dash-bar-wrap">
+    <div class="dash-bar-title">各狀態分佈</div>
+    <div id="dashBars"></div>
+  </div>
+  <div class="dash-money" id="dashMoney"></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -383,6 +434,12 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
           </div>
         </div>
       </div>
+      <div class="fgrp">
+        <label class="flbl">照片 / 檔案</label>
+        <div class="photo-grid" id="photoGrid"></div>
+        <div class="upload-progress" id="uploadProgress" style="display:none"><div class="upload-bar" id="uploadBar"></div></div>
+        <input type="file" id="photoInput" accept="image/*,application/pdf,.pdf" multiple style="display:none" onchange="handlePhotoUpload(event)">
+      </div>
       <button class="savebtn" onclick="saveProject()">儲存</button>
     </div>
   </div>
@@ -392,6 +449,8 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:var(--bg);co
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const app = initializeApp({
   apiKey:"AIzaSyCr3QybupoUWt1sng9V1_uUP4LthCgFsV0",
@@ -403,8 +462,9 @@ const app = initializeApp({
   appId:"1:345326399405:web:c7f8bd56ddff2f4ff5bb24"
 });
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-let projects=[], filter='all', sortBy='overdue', editId=null;
+let projects=[], filter='all', sortBy='duedate', editId=null;
 let currentView='list', showDone=false;
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
 let currentUserId=null, currentUserName=null, col=null, unsubscribe=null;
@@ -413,12 +473,20 @@ let currentUserId=null, currentUserName=null, col=null, unsubscribe=null;
 function getUserKey(){ return localStorage.getItem('casetracker_uid'); }
 function getUserName(){ return localStorage.getItem('casetracker_uname'); }
 
-function doLogin(){
+// Simple hash function for name+password -> stable userId
+async function makeUserId(name, pwd){
+  const raw = name.trim().toLowerCase() + '::' + pwd;
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
+  return 'u_' + Array.from(new Uint8Array(buf)).slice(0,12).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function doLogin(){
   const name=document.getElementById('loginInput').value.trim();
-  if(!name){ document.getElementById('loginInput').focus(); return; }
-  // Create stable userId from name (slug) + random suffix if new
-  let uid=localStorage.getItem('casetracker_uid');
-  if(!uid){ uid='u_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6); }
+  const pwd=document.getElementById('loginPwd').value;
+  const errEl=document.getElementById('loginError');
+  if(!name||!pwd){ errEl.style.display='block'; return; }
+  errEl.style.display='none';
+  const uid = await makeUserId(name, pwd);
   localStorage.setItem('casetracker_uid', uid);
   localStorage.setItem('casetracker_uname', name);
   startApp(uid, name);
@@ -426,7 +494,8 @@ function doLogin(){
 window.doLogin=doLogin;
 
 // Allow pressing Enter on login
-document.getElementById('loginInput').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+document.getElementById('loginInput').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('loginPwd').focus(); });
+document.getElementById('loginPwd').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
 
 function startApp(uid, name){
   currentUserId=uid; currentUserName=name;
@@ -449,6 +518,7 @@ window.switchUser=()=>{
   if(unsubscribe){ unsubscribe(); unsubscribe=null; }
   document.getElementById('userBadge').style.display='none';
   document.getElementById('loginInput').value='';
+  document.getElementById('loginPwd').value='';
   document.getElementById('loginScreen').style.display='flex';
 };
 
@@ -535,7 +605,8 @@ function cardHTML(p, isDone=false){
 function render(){
   updateStats();
   if(currentView==='list') renderList();
-  else renderCal();
+  else if(currentView==='cal') renderCal();
+  else if(currentView==='dash') renderDash();
 }
 
 function renderList(){
@@ -565,6 +636,42 @@ function renderList(){
     if(showDone) html+=done.map(p=>cardHTML(p,true)).join('');
   }
   el.innerHTML=html;
+}
+
+function renderDash(){
+  const active=projects.filter(p=>p.status!=='完成');
+  const done=projects.filter(p=>p.status==='完成');
+  const od=projects.filter(p=>(isOD(p.duedate)&&p.status!=='完成')||(p.needBalance&&isOD(p.balanceDate)));
+  const totalBal=projects.filter(p=>p.needBalance&&p.balanceAmount).reduce((s,p)=>s+Number(p.balanceAmount),0);
+  const paidBal=projects.filter(p=>p.needBalance&&p.balanceAmount&&p.status==='完成').reduce((s,p)=>s+Number(p.balanceAmount),0);
+  const unpaidBal=totalBal-paidBal;
+
+  document.getElementById('dashGrid').innerHTML=`
+    <div class="dash-card"><div class="dash-card-val">${projects.length}</div><div class="dash-card-lbl">總案廠數</div></div>
+    <div class="dash-card"><div class="dash-card-val" style="color:var(--green)">${done.length}</div><div class="dash-card-lbl">已完成</div></div>
+    <div class="dash-card"><div class="dash-card-val" style="color:var(--blue)">${active.length}</div><div class="dash-card-lbl">進行中</div></div>
+    <div class="dash-card"><div class="dash-card-val" style="color:var(--red)">${od.length}</div><div class="dash-card-lbl">逾期</div></div>
+  `;
+
+  const statuses=[{k:'已下單',c:'var(--blue)'},{k:'待追蹤',c:'var(--amber)'},{k:'維修',c:'#c8aa00'},{k:'完成',c:'var(--green)'}];
+  const maxCount=Math.max(...statuses.map(s=>projects.filter(p=>p.status===s.k).length),1);
+  document.getElementById('dashBars').innerHTML=statuses.map(s=>{
+    const n=projects.filter(p=>p.status===s.k).length;
+    const pct=Math.round(n/maxCount*100);
+    return`<div class="dash-bar-row">
+      <div class="dash-bar-lbl">${s.k}</div>
+      <div class="dash-bar-track"><div class="dash-bar-fill" style="width:${pct}%;background:${s.c}"></div></div>
+      <div class="dash-bar-num">${n}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('dashMoney').innerHTML=`
+    <div class="dash-bar-title">💳 尾款統計</div>
+    <div class="dash-money-row"><span class="dash-money-lbl">尾款總額</span><span class="dash-money-val">NT$ ${totalBal.toLocaleString()}</span></div>
+    <div class="dash-divider"></div>
+    <div class="dash-money-row"><span class="dash-money-lbl">已完成案廠尾款</span><span class="dash-money-val" style="color:var(--green)">NT$ ${paidBal.toLocaleString()}</span></div>
+    <div class="dash-money-row"><span class="dash-money-lbl">未收尾款</span><span class="dash-money-val" style="color:var(--red)">NT$ ${unpaidBal.toLocaleString()}</span></div>
+  `;
 }
 
 function updateStats(){
@@ -662,9 +769,11 @@ window.switchView=(v)=>{
   currentView=v;
   document.getElementById('listView').style.display=v==='list'?'':'none';
   document.getElementById('calView').style.display=v==='cal'?'':'none';
+  document.getElementById('dashView').style.display=v==='dash'?'':'none';
   document.getElementById('filterRow').style.display=v==='list'?'':'none';
   document.getElementById('vt-list').classList.toggle('active',v==='list');
   document.getElementById('vt-cal').classList.toggle('active',v==='cal');
+  document.getElementById('vt-dash').classList.toggle('active',v==='dash');
   render();
 };
 
@@ -734,10 +843,12 @@ window.openModal=(id=null)=>{
     const p=projects.find(x=>x.id===id);
     loadFormDraft(p);
   } else {
+    window._pendingPhotos=[];
     if(draftData && draftData.editId===null) { loadFormDraft(draftData); }
     else { loadFormDraft(null); }
   }
   document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(renderPhotoGrid,50);
 };
 window.openEdit=id=>window.openModal(id);
 window.closeModal=()=>{
@@ -774,7 +885,12 @@ window.saveProject=async()=>{
   const data={name,status:document.getElementById('f_status').value,priority:document.getElementById('f_priority').value,owner:document.getElementById('f_owner').value.trim(),duedate:document.getElementById('f_duedate').value,note:document.getElementById('f_note').value.trim(),hasDeposit:hd,needBalance:hd&&nb,balanceAmount:document.getElementById('f_balance_amount').value,balanceDate:document.getElementById('f_balance_date').value,lastOperator:op,updatedAt:serverTimestamp()};
   try{
     if(editId){await updateDoc(doc(db,"users",currentUserId,"projects",editId),data);toast('✅ 已更新');}
-    else{await addDoc(col,{...data,createdAt:serverTimestamp()});toast('✅ 已新增');}
+    else{
+    const photos=window._pendingPhotos||[];
+    const newRef=await addDoc(col,{...data,photos,createdAt:serverTimestamp()});
+    window._pendingPhotos=[];
+    toast('✅ 已新增');
+  }
     draftData=null; window.closeModal();
   }catch{toast('❌ 儲存失敗');}
 };
@@ -840,6 +956,63 @@ window.calDayClick=(d)=>{
 };
 
 document.getElementById('searchInput').addEventListener('input',render);
+
+// ── PHOTO UPLOAD ──
+window.triggerPhotoUpload=()=>{ document.getElementById('photoInput').click(); };
+window.handlePhotoUpload=async(e)=>{
+  if(!editId && !window._pendingPhotos) window._pendingPhotos=[];
+  const files=[...e.target.files]; if(!files.length) return;
+  const prog=document.getElementById('uploadProgress');
+  const bar=document.getElementById('uploadBar');
+  prog.style.display='block'; bar.style.width='0%';
+  const uploaded=[];
+  for(let i=0;i<files.length;i++){
+    const file=files[i];
+    const path=`users/${currentUserId}/photos/${Date.now()}_${file.name}`;
+    const sref=ref(storage,path);
+    await uploadBytes(sref,file);
+    const url=await getDownloadURL(sref);
+    uploaded.push({url,path,name:file.name});
+    bar.style.width=`${Math.round((i+1)/files.length*100)}%`;
+  }
+  prog.style.display='none';
+  if(editId){
+    const p=projects.find(x=>x.id===editId);
+    const photos=[...(p?.photos||[]),...uploaded];
+    await updateDoc(doc(db,'users',currentUserId,'projects',editId),{photos});
+    toast('📷 已上傳');
+  } else {
+    window._pendingPhotos=[...(window._pendingPhotos||[]),...uploaded];
+  }
+  renderPhotoGrid();
+  e.target.value='';
+};
+function renderPhotoGrid(){
+  const p=editId?projects.find(x=>x.id===editId):null;
+  const photos=[...(p?.photos||[]),...(window._pendingPhotos||[])];
+  const grid=document.getElementById('photoGrid');
+  if(!grid) return;
+  grid.innerHTML=photos.map((ph,i)=>`
+    <div class="photo-thumb">
+      <img src="${ph.url}" loading="lazy">
+      <button class="photo-del" onclick="removePhoto(${i})">✕</button>
+    </div>`).join('')+`
+    <button class="photo-add" onclick="triggerPhotoUpload()">
+      <span class="photo-add-ico">＋</span>
+      <span class="photo-add-lbl">照片/PDF</span>
+    </button>`;
+}
+window.removePhoto=async(idx)=>{
+  if(!editId){ if(window._pendingPhotos) window._pendingPhotos.splice(idx,1); renderPhotoGrid(); return; }
+  const p=projects.find(x=>x.id===editId);
+  const photos=[...(p?.photos||[])];
+  const ph=photos[idx];
+  try{ await deleteObject(ref(storage,ph.path)); }catch(e){}
+  photos.splice(idx,1);
+  await updateDoc(doc(db,'users',currentUserId,'projects',editId),{photos});
+  toast('已刪除');
+};
+window.openPhoto=(url)=>{ window.open(url,'_blank'); };
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
